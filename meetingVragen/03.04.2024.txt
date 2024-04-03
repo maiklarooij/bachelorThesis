@@ -1,0 +1,36 @@
+ALGEMEEN
+- Ik ben van plan cum laude te slagen, dus als het zou kunnen zou ik graag feedback
+  willen krijgen met dit in gedachten.
+- Ik werk twee dagen in de week, vaak maandag en donderdag of vrijdag. Dit zal
+  uiteraard geen probleem creeeren met de thesis, en als dit toch een obstakel
+  blijkt heb ik de vrijheid mijn werkdagen te verminderen.
+
+VRAGEN
+- Het project bouwt voor op een POC van een masterscriptie van afgelopen jaar. In hoeverre
+  bouwt het zich hierop voor en in hoeverre is het POC aan te passen?
+    - bijvoorbeeld, ik heb de scriptie even doorgescand en ik zag dat er een text embedder
+      werd gebruikt waar ik het niet direct mee eens ben (openai ADA), laatste keer dat ik keek
+      zijn er tegenwoordig een stuk betere embedders (misschien zelf een multi lingual?)
+    - Misschien heb ik er over hen gelezen, maar waar werden de embeddings van de documenten
+      bewaard? Ik ben van plan een vector database te gebruiken wegens de simpele schaalbaarheid
+      en snelheid
+    - Wordt er iets van een frontend verwacht? Dit maakt het simpeler te zoeken voor atechnische mensen.
+      Ook lijkt dit 'indrukwekkender' voor de massa
+
+- Restricties, het embedden en transcriben kan computatief intensief zijn. Zijn  er servers tot beschikking?
+  Ik heb zelf ook toegang tot prima servers dus zo niet is dat geen issue.
+
+- Wat bedoelt u precies met 'Kijk eens of dat op te halen valt en ook of je die “inhoudsopgave in sprekers
+  kunt meepikken. Het zou ook te gek zijn dit te koppelen aan de handelingen (het geshcreven verslag).'
+
+ideeen
+- Zeta Alpha op sciencepark contact
+- Weaviate vector database
+- Spreker herkenning: Ik ben bekend met een netwerk daarvoor die verschillende
+  sprekers en hun segmenten kan vinden. Ik ben van plan dan deze sprekers (in het
+  begin) handmatig te labelen. Zodra een persoon gelabelt is wordt een stuk embedded
+  spraak opgeslagen om dit later te vergelijken voor automatische spreker herkenning.
+    - Voorgaande sriptie had ook een vorm van spreker herkenning ingebouwd, had expres
+      niet te veel gelezen hoe dit specifiek werkte omdat ik niet te veel beinvloed wilde
+      worden.
+    - Nog uitzoeken hoe goed dit zal werken
