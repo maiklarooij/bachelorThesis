@@ -1,5 +1,9 @@
-data/
+# data/
+*.pdf
 *.mp4
 .DS_Store
 */.DS_Store
 meetings/
+
+__pycache__
+*/__pycache__
