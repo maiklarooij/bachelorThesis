@@ -9,3 +9,5 @@ __pycache__
 */__pycache__
 
 *.npz
+src/models/*
+!src/models/README.md
