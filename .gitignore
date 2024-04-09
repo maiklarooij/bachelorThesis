@@ -7,3 +7,5 @@ meetings/
 
 __pycache__
 */__pycache__
+
+*.npz
