@@ -39,6 +39,8 @@ class MLX_Transcriber(Transcriber):
         self.model = model
 
     def transcribe(self, input_file, output_file):
+        if not os.path.exists(input_file):
+            return WhisperReturnCodes.INPUTFILE_DOES_NOT_EXIST
         # If transcription already exists, do not redo it.
         if os.path.exists(output_file):
             return WhisperReturnCodes.TRANSCRIPTION_ALREADY_EXISTS
