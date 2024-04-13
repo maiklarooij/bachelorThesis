@@ -1,6 +1,7 @@
 # data/
 *.pdf
 *.mp4
+*.wav
 .DS_Store
 */.DS_Store
 meetings/
