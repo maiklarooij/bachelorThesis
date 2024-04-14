@@ -91,5 +91,7 @@ async def delete_entry():
 
 # TODO
 @app.post("/api/embed")
-async def embed():
-    raise HTTPException(status_code=501, detail="Not implemented")
+async def embed(body: EmbedBody):
+    embeddings = embed_client.embed(body.texts)
+
+    return {"status": "OK", "embeddings": embeddings}
