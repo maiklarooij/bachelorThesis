@@ -5,11 +5,11 @@ from UserTypes import EmbedReturnCodes
 
 
 class Embedder:
-    def embed(self, texts):
+    def embed(self, text):
         if not self.model:
             return EmbedReturnCodes.NO_MODEL
 
-        return self.model.encode(texts)
+        return self.model.encode(text)
 
 
 # https://huggingface.co/Salesforce/SFR-Embedding-Mistral
