@@ -92,6 +92,9 @@ async def delete_entry():
 # TODO
 @app.post("/api/embed")
 async def embed(body: EmbedBody):
-    embeddings = embed_client.embed(body.texts)
+    if not embed_client:
+        raise HTTPException(status_code=503, detail="Text embed client not active")
 
-    return {"status": "OK", "embeddings": embeddings}
+    embeddings = embed_client.embed(body.text).tolist()
+
+    return { "status": "OK", "embeddings": embeddings }
