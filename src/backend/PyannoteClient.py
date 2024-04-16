@@ -21,14 +21,12 @@ class Pyannote:
         )
         self.diorize_pipeline.to(torch.device(device))
 
-        # self.inference = Inference(
-        #     Model.from_pretrained(
-        #         "pyannote/embedding",
-        #         os.getenv("HF_PYANNOTE_ACCESS_TOKEN"),
-        #     ),
-        #     window="whole",
-        # )
-        # self.inference.to(torch.device(device))
+        inference = Model.from_pretrained(
+            "pyannote/embedding",
+            use_auth_token=os.getenv("HF_PYANNOTE_ACCESS_TOKEN_EMB"),
+        )
+        self.inference = Inference( inference, window="whole")
+        self.inference.to(torch.device(device))
 
     def diorize(self, input_file, output_file):
         if not input_file.endswith(".wav"):
@@ -47,4 +45,8 @@ class Pyannote:
     def embed(self, input_file, output_file, from_time, to_time):
         excerpt = Segment(from_time, to_time)
         embedding = self.inference.crop(input_file, excerpt)
-        print(embedding)  # tmp
+
+        if output_file != "":
+            pass  # todo
+
+        return embedding.tolist()
