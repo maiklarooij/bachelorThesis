@@ -1,3 +1,4 @@
+import argparse
 import os
 
 import torch
@@ -12,6 +13,18 @@ from WhisperClient import MLX_Transcriber, Torch_Transcriber
 load_dotenv()
 
 device = "mps" if torch.backends.mps.is_available() else 'cuda' if torch.cuda.is_available() else "cpu"
+print(f"Running on {device}")
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Woogle video archive search backend.")
+    parser.add_argument("-w", "--whisper", action="store_true")
+    parser.add_argument("-v", "--weaviate", action="store_true")
+    parser.add_argument("-p", "--pyannote", action="store_true")
+    parser.add_argument("-e", "--embed", action="store_true")
+    parser.add_argument("-l", "--llm", action="store_true")
+
+    return parser.parse_args()
+
 
 # TODO: check if cuda/ mlx is available and initialise based on that
 whisper_client = None
