@@ -6,6 +6,16 @@ from UserTypes import WhisperReturnCodes, PyannoteReturnCodes
 def verify_whisper_return_code(code):
     if code == WhisperReturnCodes.OK:
         return
+    elif code == WhisperReturnCodes.OTHER_ERROR:
+        raise HTTPException(
+            status_code=500,
+            detail="Error in transcribing: unexpected error occured",
+        )
+    elif code == WhisperReturnCodes.NOT_IMPLEMENTED:
+        raise HTTPException(
+            status_code=501,
+            detail="Error in transcribing: method not implemented",
+        )
     elif code == WhisperReturnCodes.TRANSCRIPTION_ALREADY_EXISTS:
         raise HTTPException(
             status_code=500,
@@ -20,6 +30,11 @@ def verify_whisper_return_code(code):
         raise HTTPException(
             status_code=500,
             detail="Error in saving transcription: No transcription provided",
+        )
+    elif code == WhisperReturnCodes.INPUTFILE_DOES_NOT_EXIST:
+        raise HTTPException(
+            status_code=500,
+            detail="Error in transcribing: input file does not exist",
         )
     elif code == WhisperReturnCodes.INVALID_MODEL:
         raise HTTPException(status_code=500, detail="Whisper client has invalid model")
@@ -45,3 +60,5 @@ def verify_pyannote_return_code(code):
             status_code=500,
             detail="Error in pyannote client: Input audio file has to be of .wav format",
         )
+    else:
+        raise HTTPException(status_code=500, detail="Unknown whisper return code")
