@@ -77,6 +77,76 @@ async def load_transcription():
 
 
 # TODO
+@app.post("/api/pyannote/diorize")
+async def diorize(body: DiorizeBody):
+    if not pyannote_client:
+        raise HTTPException(status_code=503, detail="Pyannote client not active")
+
+    try:
+        r = pyannote_client.diorize(body.input_path, body.output_path)
+    except Exception as e:
+        print("Error in pyannote diorization:", e)
+        raise HTTPException(status_code=500, detail=f"Internal server error: {e}")
+
+    verify_pyannote_return_code(r)
+
+    return { "status": "OK" }
+
+
+@app.post("/api/pyannote/embed")
+async def embed_speech(body: SpeechEmbedBody):
+    if not pyannote_client:
+        raise HTTPException(status_code=503, detail="Pyannote client not active")
+
+    try:
+        embedding = pyannote_client.embed(body.input_path, body.output_path, body.from_time, body.to_time)
+    except Exception as e:
+        print("Error embedding!", e)
+        embedding = None
+
+    # verify_pyannote_return_code(r)
+    # embedding = None # todo
+
+    try:
+        return { "status": "OK", "embedding": embedding }
+    except Exception as e:
+        print("Error serializing:", e)
+        return { "status": "OK", "embedding": None }
+
+
+# TODO: error handling
+@app.get("/api/weaviate/getInfo")
+async def get_info():
+    if not weaviate_client:
+        raise HTTPException(status_code=503, detail="Weaviate client not active")
+
+    info = weaviate_client.get_info()
+    return { "status": "OK", "info": info }
+
+
+# TODO: error handling
+@app.get("/api/weaviate/getCollections")
+async def get_colletions():
+    if not weaviate_client:
+        raise HTTPException(status_code=503, detail="Weaviate client not active")
+
+    collections = weaviate_client.get_all_collections()
+    print(collections)
+
+    return { "status": "OK", "collections": collections } # TODO: Return collections
+
+
+# TODO: error handling
+@app.get("/api/weaviate/getCollection")
+async def get_colletion():
+    if not weaviate_client:
+        raise HTTPException(status_code=503, detail="Weaviate client not active")
+
+    info = weaviate_client.get_collection_info("TestCollection")
+    print(info)
+
+    return { "status": "OK", "collectionInfo": info }
+
 @app.post("/api/weaviate/createCollection")
 async def create_collection():
     raise HTTPException(status_code=501, detail="Not implemented")
