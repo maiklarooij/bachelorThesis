@@ -54,6 +54,9 @@ async def root():
 
 @app.post("/api/whisper/transcribe")
 async def transcribe(body: TranscribeBody):
+    if not whisper_client:
+        raise HTTPException(status_code=503, detail="Whisper client not active")
+
     global transcribing
     if transcribing:
         raise HTTPException(status_code=503, detail="Whisper client is busy")
@@ -61,19 +64,15 @@ async def transcribe(body: TranscribeBody):
     transcribing = True
     try:
         r = whisper_client.transcribe(body.input_path, body.output_path)
-    except Exception as _:
+    except Exception as e:
+        print("Error!", e)
         transcribing = False
+        r = WhisperReturnCodes.OTHER_ERROR
 
     verify_whisper_return_code(r)
     transcribing = False
 
-    return {"status": "OK"}
-
-
-# TODO
-@app.get("/api/whisper/load")
-async def load_transcription():
-    raise HTTPException(status_code=501, detail="Not implemented")
+    return { "status": "OK" }
 
 
 # TODO
