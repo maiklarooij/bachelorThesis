@@ -42,11 +42,8 @@ class Pyannote:
         with open(output_file, "w") as rttm:
             diarization.write_rttm(rttm)
 
-    def embed(self, input_file, output_file, from_time, to_time):
+    def embed(self, input_file, from_time, to_time):
         excerpt = Segment(from_time, to_time)
         embedding = self.inference.crop(input_file, excerpt)
-
-        if output_file != "":
-            pass  # todo
 
         return embedding.tolist()

@@ -99,19 +99,16 @@ async def embed_speech(body: SpeechEmbedBody):
         raise HTTPException(status_code=503, detail="Pyannote client not active")
 
     try:
-        embedding = pyannote_client.embed(body.input_path, body.output_path, body.from_time, body.to_time)
+        embedding = pyannote_client.embed(body.input_path, body.from_time, body.to_time)
     except Exception as e:
-        print("Error embedding!", e)
-        embedding = None
-
-    # verify_pyannote_return_code(r)
-    # embedding = None # todo
+        print("Error in pyannote embedding!", e)
+        raise HTTPException(status_code=500, detail=f"Internal server error: {e}")
 
     try:
         return { "status": "OK", "embedding": embedding }
     except Exception as e:
         print("Error serializing:", e)
-        return { "status": "OK", "embedding": None }
+        HTTPException(status_code=500, detail=f"Internal server error: {e}")
 
 
 # TODO: error handling
