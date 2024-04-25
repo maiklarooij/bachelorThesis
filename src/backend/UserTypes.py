@@ -1,3 +1,4 @@
+from typing import List, Any, Dict, Optional
 from pydantic import BaseModel
 
 class WhisperReturnCodes:
@@ -40,3 +41,51 @@ class SpeechEmbedBody(BaseModel):
     output_path: str
     from_time: float
     to_time: float
+
+
+class Property(BaseModel):
+    name: str
+    data_type: str
+
+class WeaviateCreateCollectionBody(BaseModel):
+    name: str
+    vector_index_hnsw: bool
+    distance_config: str
+    properties: List[Property]
+    # TODO: BM25 settings
+
+class WeaviateInsertBody(BaseModel):
+    collection: str
+    objects: List[Dict[str, Any]]
+
+class WeaviateGetCollectionBody(BaseModel):
+    collection: str
+
+class WeaviateSearchHybridBody(BaseModel):
+    collection: str
+    query: str
+    vector: List[float]
+    limit: int
+    alpha: float
+    query_properties: Optional[List[str]] = None
+
+class WeaviateSearchBM25Body(BaseModel):
+    collection: str
+    query: str
+    limit: int
+    query_properties: Optional[List[str]] = None
+
+class WeaviateSearchVectorBody(BaseModel):
+    collection: str
+    vector: List[float]
+    limit: int
+
+class WeaviateDeleteCollectionBody(BaseModel):
+    collection: str
+
+class EmbedBody(BaseModel):
+    text: List[str]
+
+class AgendaBody(BaseModel):
+    full_text: str
+    agenda_points: List[Dict[str, str]]
