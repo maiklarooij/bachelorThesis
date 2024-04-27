@@ -34,13 +34,12 @@ print(f"Running on {device}")
 
 # TODO: check if cuda/ mlx is available and initialise based on that
 whisper_client = None
-if device == "mps":
-    print("Loading whisper MLX client")
-    whisper_client = MLX_Transcriber(os.environ.get("MLX_WHISPER_MODEL"))
-else:
-    print("Loading whisper Torch client")
-    whisper_client = Torch_Transcriber()
-transcribing = False
+# if device == "mps":
+#     print("Loading whisper MLX client")
+#     whisper_client = MLX_Transcriber(os.environ.get("MLX_WHISPER_MODEL"))
+# else:
+#     print("Loading whisper Torch client")
+#     whisper_client = Torch_Transcriber()
 
 pyannote_client = None
 # print("Loading pyannote client")
@@ -70,20 +69,13 @@ async def transcribe(body: TranscribeBody):
     if not whisper_client:
         raise HTTPException(status_code=503, detail="Whisper client not active")
 
-    global transcribing
-    if transcribing:
-        raise HTTPException(status_code=503, detail="Whisper client is busy")
-
-    transcribing = True
     try:
         r = whisper_client.transcribe(body.input_path, body.output_path)
     except Exception as e:
         print("Error!", e)
-        transcribing = False
         r = WhisperReturnCodes.OTHER_ERROR
 
     verify_whisper_return_code(r)
-    transcribing = False
 
     return { "status": "OK" }
 
