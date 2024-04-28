@@ -1,10 +1,14 @@
+import json
 import os
 import torch
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
 
-from appUtils import verify_whisper_return_code, verify_pyannote_return_code
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+
+from appUtils import verify_whisper_return_code, verify_pyannote_return_code, get_number_videos_gemeentes
 from UserTypes import (
     TranscribeBody,
     DiorizeBody,
@@ -42,8 +46,8 @@ whisper_client = None
 #     whisper_client = Torch_Transcriber()
 
 pyannote_client = None
-# print("Loading pyannote client")
-# pyannote_client = Pyannote(device)
+print("Loading pyannote client")
+pyannote_client = Pyannote(device)
 
 weaviate_client = None
 # print("Loading Weaviate client")
@@ -58,6 +62,22 @@ llm_client = None
 # llm_client = MlxLlama(model_name="mlx-community/Meta-Llama-3-8B-Instruct-8bit")
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+)
+
+
+app.mount(
+    "/videos",
+    StaticFiles(directory="/Users/personal/Desktop/scriptie/notebooks/data"),
+    name="videos",
+)
+
 
 @app.get("/api/status")
 async def root():
@@ -85,7 +105,6 @@ async def transcribe(body: TranscribeBody):
 async def diorize(body: DiorizeBody):
     if not pyannote_client:
         raise HTTPException(status_code=503, detail="Pyannote client not active")
-
     try:
         r = pyannote_client.diorize(body.input_path, body.output_path)
     except Exception as e:
@@ -263,19 +282,136 @@ async def chat():
         raise HTTPException(status_code=503, detail="Llm client not active")
 
 
-BASE_PATH = "/Volumes/Samsung_T5/data/"
+BASE_PATHS = [
+    "/Volumes/Samsung_T5/data/",
+    "/Users/personal/Desktop/scriptie/notebooks/data/",
+]
 @app.get("/api/gemeentes")
 async def get_gemeentes():
-    gemeentes = os.listdir(BASE_PATH)
+    gemeentes = []
+    for path in BASE_PATHS:
+        gemeentes += [os.path.join(path, gems) for gems in os.listdir(path)]
+
+    gemeentes = [
+        {
+            "gemeente": g.split("/")[-1],
+            "videos": get_number_videos_gemeentes(g),
+            "path": g,
+        }
+        for g in gemeentes
+        if not g.split("/")[-1].startswith(".")
+    ]
+
 
     return { "status": "OK", "gemeentes": gemeentes}
 
 
-@app.get("/api/gemeenteVideos")
-async def get_gemeente_videos(gemeente: str):
-    if not os.isdir(f"{BASE_PATH}/{gemeente}"):
-        raise HTTPException(status_code=500, detail=f"Gemeente {gemeente} does not exist.")
+@app.get("/api/gemeenteMeetingTypes")
+async def get_gemeente_types(gemeente: str):
+    p = None
+    for path in BASE_PATHS:
+        if os.path.isdir(f"{path}/{gemeente}"):
+            p = f"{path}/{gemeente}"
+    if not p:
+        raise HTTPException(
+            status_code=404, detail=f"Gemeente {gemeente} does not exist."
+        )
 
-    meetings = os.listdir(f"{BASE_PATH}/{gemeente}")
+    meetingTypes = [
+        {
+            "type": t,
+        }
+        for t in os.listdir(p)
+        if not t.startswith(".")
+    ]
 
-    return {"status": "OK", "meetings": meetings}
+    return {"status": "OK", "types": meetingTypes}
+
+
+@app.get("/api/gemeenteYears")
+async def get_gemeente_years(gemeente: str, meetingType: str):
+    p = None
+    # Gets meeting
+    for path in BASE_PATHS:
+        if os.path.isdir(f"{path}/{gemeente}/{meetingType}"):
+            p = f"{path}/{gemeente}/{meetingType}"
+    if not p:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Gemeente {gemeente} with type {meetingType} does not exist.",
+        )
+
+    years = [
+        {"year": y}
+        for y in os.listdir(p)
+        if not y.startswith(".")
+    ]
+
+    return {"status": "OK", "years": years}
+
+@app.get("/api/getVideos")
+async def get_gemeente_videos(gemeente: str, meetingType: str, year: str):
+    p = None
+    # Gets meeting
+    for path in BASE_PATHS:
+        if os.path.isdir(f"{path}/{gemeente}/{meetingType}/{year}"):
+            p = f"{path}/{gemeente}/{meetingType}/{year}"
+    if not p:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Gemeente {gemeente} with type {meetingType} and year {year} does not exist.",
+        )
+
+    video_dir = f"{path}/{gemeente}/{meetingType}/{year}/videos"
+    if os.path.isdir(video_dir):
+        videos = [
+            {"video": v.replace(".mp4", "")}
+            for v in os.listdir(video_dir)
+            if not v.startswith(".")
+        ]
+    else:
+        videos = []
+
+    return {"status": "OK", "videos": videos}
+
+
+@app.get("/api/getVideo")
+async def get_gemeente_video(gemeente: str, meetingType: str, year: str, video: str):
+    p = None
+    for path in BASE_PATHS:
+        if os.path.isfile(f"{path}/{gemeente}/{meetingType}/{year}/videos/{video}"):
+            p = f"{path}/{gemeente}/{meetingType}/{year}/videos/{video}"
+    if not p:
+        raise HTTPException(
+            status_code=404,
+            detail=f"video {video} with gemeente {gemeente} with type {meetingType} and year {year} does not exist.",
+        )
+
+    print(os.path.abspath(p))
+    return {"status": "OK", "videoPath": os.path.abspath(p)}
+
+@app.get("/api/getTranscript")
+async def get_video_transcript(gemeente: str, meetingType: str, year: str, video: str):
+    p = None
+    for path in BASE_PATHS:
+        if os.path.isfile(f"{path}/{gemeente}/{meetingType}/{year}/videos/{video}"):
+            p = f"{path}/{gemeente}/{meetingType}/{year}/videos/{video}"
+    if not p:
+        raise HTTPException(
+            status_code=404,
+            detail=f"video {video} with gemeente {gemeente} with type {meetingType} and year {year} does not exist.",
+        )
+
+    transcript_path = f"{path}/{gemeente}/{meetingType}/{year}/transcripts/{video}.json"
+    if not os.path.isfile(transcript_path):
+        raise HTTPException(
+            status_code=404,
+            detail=f"Transcript for video {video} with gemeente {gemeente} with type {meetingType} and year {year} does not exist.",
+        )
+
+    with open(transcript_path, "r") as f:
+        data = json.load(f)
+
+    transcript = data.get("text")
+
+    return {"status": "OK", "transcript": transcript}

@@ -1,3 +1,4 @@
+import os
 from fastapi import HTTPException
 
 from UserTypes import WhisperReturnCodes, PyannoteReturnCodes
@@ -62,3 +63,12 @@ def verify_pyannote_return_code(code):
         )
     else:
         raise HTTPException(status_code=500, detail="Unknown whisper return code")
+
+def get_number_videos_gemeentes(path):
+    # TODO: also include category!
+    total = 0
+    for year in os.listdir(path):
+        if os.path.isdir(f"{path}/{year}/videos"):
+            total += len([v for v in os.listdir(f"{path}/{year}/videos") if not v.startswith(".")])
+
+    return total
