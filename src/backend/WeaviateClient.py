@@ -42,6 +42,12 @@ def get_datatype(type_string):
 
 def get_filters(governments, meeting_types, years, speakers):
     filters = None
+    # Removes empty string elements.
+    governments = list(filter(lambda x: x != "", governments))
+    meeting_types = list(filter(lambda x: x != "", meeting_types))
+    years = list(filter(lambda x: x != "", years))
+    speakers = list(filter(lambda x: x != "", speakers))
+
     if filters is None and len(governments) > 0:
         filters = Filter.by_property("government").contains_any(governments)
     elif len(governments) > 0:
