@@ -199,7 +199,17 @@ async def search_h(body: WeaviateSearchHybridBody):
     if not weaviate_client:
         raise HTTPException(status_code=503, detail="Weaviate client not active")
 
-    kwargs = {"collection": body.collection, "query": body.query, "vector": body.vector, "limit": body.limit, "alpha": body.alpha}
+    kwargs = {
+        "collection": body.collection,
+        "query": body.query,
+        "vector": body.vector,
+        "limit": body.limit,
+        "alpha": body.alpha,
+        "governments": body.government,
+        "meeting_types": body.meetingType,
+        "years": body.year,
+        "speakers": body.speaker,
+    }
     if body.query_properties is not None:
         kwargs["query_properties"] = body.query_properties
     objects = weaviate_client.search_hybrid(**kwargs)
@@ -214,7 +224,15 @@ async def search_b(body: WeaviateSearchBM25Body):
     if not weaviate_client:
         raise HTTPException(status_code=503, detail="Weaviate client not active")
 
-    kwargs = {"collection": body.collection, "query": body.query, "limit": body.limit}
+    kwargs = {
+        "collection": body.collection,
+        "query": body.query,
+        "limit": body.limit,
+        "governments": body.government,
+        "meeting_types": body.meetingType,
+        "years": body.year,
+        "speakers": body.speaker,
+    }
     if body.query_properties is not None:
         kwargs["query_properties"] = body.query_properties
     objects = weaviate_client.search_bm25(**kwargs)
@@ -229,7 +247,15 @@ async def search_v(body: WeaviateSearchVectorBody):
     if not weaviate_client:
         raise HTTPException(status_code=503, detail="Weaviate client not active")
 
-    objects = weaviate_client.search_vector(body.collection, body.vector, body.limit)
+    objects = weaviate_client.search_vector(
+        body.collection,
+        body.vector,
+        body.limit,
+        body.government,
+        body.meetingType,
+        body.year,
+        body.speaker,
+    )
     # Verify objects & get return code
 
     return { "status": "OK", "objects": objects }

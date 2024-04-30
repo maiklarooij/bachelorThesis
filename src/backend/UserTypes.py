@@ -67,18 +67,30 @@ class WeaviateSearchHybridBody(BaseModel):
     vector: List[float]
     limit: int
     alpha: float
+    government: List[str]
+    meetingType: List[str]
+    year: List[str]
+    speaker: List[str]
     query_properties: Optional[List[str]] = None
 
 class WeaviateSearchBM25Body(BaseModel):
     collection: str
     query: str
     limit: int
+    government: List[str]
+    meetingType: List[str]
+    year: List[str]
+    speaker: List[str]
     query_properties: Optional[List[str]] = None
 
 class WeaviateSearchVectorBody(BaseModel):
     collection: str
     vector: List[float]
     limit: int
+    government: List[str]
+    meetingType: List[str]
+    year: List[str]
+    speaker: List[str]
 
 class WeaviateDeleteCollectionBody(BaseModel):
     collection: str
