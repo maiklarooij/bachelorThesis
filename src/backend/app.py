@@ -338,7 +338,6 @@ async def get_gemeentes():
         if not g.split("/")[-1].startswith(".")
     ]
 
-
     return { "status": "OK", "gemeentes": gemeentes}
 
 

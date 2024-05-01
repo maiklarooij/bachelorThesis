@@ -66,11 +66,15 @@ def verify_pyannote_return_code(code):
         raise HTTPException(status_code=500, detail="Unknown whisper return code")
 
 def get_number_videos_gemeentes(path):
-    # TODO: also include category!
     total = 0
-    for year in os.listdir(path):
-        if os.path.isdir(f"{path}/{year}/videos"):
-            total += len([v for v in os.listdir(f"{path}/{year}/videos") if not v.startswith(".")])
+    for meeting_type in os.listdir(path):
+        if meeting_type.startswith("."):
+            continue
+        for year in os.listdir(f"{path}/{meeting_type}"):
+            if year.startswith("."):
+                continue
+            if os.path.isdir(f"{path}/{meeting_type}/{year}/videos"):
+                total += len([v for v in os.listdir(f"{path}/{meeting_type}/{year}/videos") if not v.startswith(".")])
 
     return total
 
