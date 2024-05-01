@@ -8,6 +8,9 @@ meetings/
 *objects*
 .env
 
+notebooks/data/
+
+
 __pycache__
 */__pycache__
 

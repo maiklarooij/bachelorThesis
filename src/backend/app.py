@@ -7,8 +7,14 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import FileResponse
 
-from appUtils import verify_whisper_return_code, verify_pyannote_return_code, get_number_videos_gemeentes
+from appUtils import (
+    verify_whisper_return_code,
+    verify_pyannote_return_code,
+    get_number_videos_gemeentes,
+    get_video_length,
+)
 from UserTypes import (
     TranscribeBody,
     DiorizeBody,
@@ -46,16 +52,16 @@ whisper_client = None
 #     whisper_client = Torch_Transcriber()
 
 pyannote_client = None
-print("Loading pyannote client")
-pyannote_client = Pyannote(device)
+# print("Loading pyannote client")
+# pyannote_client = Pyannote(device)
 
 weaviate_client = None
-# print("Loading Weaviate client")
-# weaviate_client = Weaviate()
+print("Loading Weaviate client")
+weaviate_client = Weaviate()
 
 embed_client = None
-# print("Loading embedding client")
-# embed_client = MpnetEmbedder()
+print("Loading embedding client")
+embed_client = MpnetEmbedder()
 
 llm_client = None
 # print("Loading llm client")
@@ -403,8 +409,8 @@ async def get_gemeente_videos(gemeente: str, meetingType: str, year: str):
     return {"status": "OK", "videos": videos}
 
 
-@app.get("/api/getVideo")
-async def get_gemeente_video(gemeente: str, meetingType: str, year: str, video: str):
+@app.get("/api/getVideoData")
+async def get_gemeente_video_data(gemeente: str, meetingType: str, year: str, video: str):
     p = None
     for path in BASE_PATHS:
         if os.path.isfile(f"{path}/{gemeente}/{meetingType}/{year}/videos/{video}"):
@@ -416,7 +422,23 @@ async def get_gemeente_video(gemeente: str, meetingType: str, year: str, video: 
         )
     duration = get_video_length(p)
     print(os.path.abspath(p))
-    return {"status": "OK", "videoPath": os.path.abspath(p), "duration": duration}
+    return {"status": "OK", "duration": duration}
+
+@app.get("/api/getVideo")
+async def get_gemeente_video(gemeente: str, meetingType: str, year: str, video: str):
+    p = None
+    for path in BASE_PATHS:
+        if os.path.isfile(f"{path}/{gemeente}/{meetingType}/{year}/videos/{video}"):
+            p = f"{path}/{gemeente}/{meetingType}/{year}/videos/{video}"
+    if not p:
+        raise HTTPException(
+            status_code=404,
+            detail=f"video {video} with gemeente {gemeente} with type {meetingType} and year {year} does not exist.",
+        )
+
+    print(os.path.abspath(p))
+
+    return FileResponse(os.path.abspath(p), media_type="video/mp4")
 
 
 @app.get("/api/getAgenda")

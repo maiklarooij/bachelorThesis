@@ -1,4 +1,5 @@
 import os
+import subprocess
 from fastapi import HTTPException
 
 from UserTypes import WhisperReturnCodes, PyannoteReturnCodes
