@@ -310,6 +310,7 @@ async def chat():
 
 BASE_PATHS = [
     "/Volumes/Samsung_T5/data/",
+    "/Volumes/Drive/data/",
     "/Users/personal/Desktop/scriptie/notebooks/data/",
 ]
 @app.get("/api/gemeentes")
@@ -388,7 +389,7 @@ async def get_gemeente_videos(gemeente: str, meetingType: str, year: str):
             detail=f"Gemeente {gemeente} with type {meetingType} and year {year} does not exist.",
         )
 
-    video_dir = f"{path}/{gemeente}/{meetingType}/{year}/videos"
+    video_dir = f"{p}/videos"
     if os.path.isdir(video_dir):
         videos = [
             {"video": v.replace(".mp4", "")}
@@ -396,6 +397,7 @@ async def get_gemeente_videos(gemeente: str, meetingType: str, year: str):
             if not v.startswith(".")
         ]
     else:
+        print("No videos directory exists", video_dir)
         videos = []
 
     return {"status": "OK", "videos": videos}
@@ -412,9 +414,51 @@ async def get_gemeente_video(gemeente: str, meetingType: str, year: str, video: 
             status_code=404,
             detail=f"video {video} with gemeente {gemeente} with type {meetingType} and year {year} does not exist.",
         )
-
+    duration = get_video_length(p)
     print(os.path.abspath(p))
-    return {"status": "OK", "videoPath": os.path.abspath(p)}
+    return {"status": "OK", "videoPath": os.path.abspath(p), "duration": duration}
+
+
+@app.get("/api/getAgenda")
+async def get_video_agenda(gemeente: str, meetingType: str, year: str, video: str):
+    video = video.replace(".mp4", "")
+    p = None
+    for path in BASE_PATHS:
+        if os.path.isfile(f"{path}/{gemeente}/{meetingType}/{year}/agendas/{video}.json"):
+            p = f"{path}/{gemeente}/{meetingType}/{year}/agendas/{video}.json"
+    if not p:
+        raise HTTPException(
+            status_code=404,
+            detail=f"agenda for video {video} with gemeente {gemeente} with type {meetingType} and year {year} does not exist.",
+        )
+
+    with open(p, "r") as f:
+        agenda_data = json.load(f)
+
+    return {"status": "OK", "agenda": agenda_data}
+
+
+@app.get("/api/getSpeakers")
+async def get_video_speakers(gemeente: str, meetingType: str, year: str, video: str):
+    p = None
+    for path in BASE_PATHS:
+        if os.path.isfile(f"{path}/{gemeente}/{meetingType}/{year}/turnObjects/{video}.json"):
+            p = f"{path}/{gemeente}/{meetingType}/{year}/turnObjects/{video}.json"
+    if not p:
+        raise HTTPException(
+            status_code=404,
+            detail=f"speakers for video {video} with gemeente {gemeente} with type {meetingType} and year {year} do not exist.",
+        )
+
+    with open(p, "r") as f:
+        speakers = json.load(f)
+
+    speakers_shortened = [
+        {"speaker": s["speaker"], "start": s["start"], "end": s["end"]}
+        for s in speakers
+    ]
+
+    return {"status": "OK", "speakers": speakers_shortened}
 
 @app.get("/api/getTranscript")
 async def get_video_transcript(gemeente: str, meetingType: str, year: str, video: str):

@@ -72,3 +72,12 @@ def get_number_videos_gemeentes(path):
             total += len([v for v in os.listdir(f"{path}/{year}/videos") if not v.startswith(".")])
 
     return total
+
+def get_video_length(filepath):
+    result = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
+                            "format=duration", "-of",
+                            "default=noprint_wrappers=1:nokey=1", filepath],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.STDOUT)
+
+    return float(result.stdout)
