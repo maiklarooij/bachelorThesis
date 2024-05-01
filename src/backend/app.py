@@ -215,6 +215,7 @@ async def search_h(body: WeaviateSearchHybridBody):
         "meeting_types": body.meetingType,
         "years": body.year,
         "speakers": body.speaker,
+        "videos": body.video,
     }
     if body.query_properties is not None:
         kwargs["query_properties"] = body.query_properties
@@ -238,6 +239,7 @@ async def search_b(body: WeaviateSearchBM25Body):
         "meeting_types": body.meetingType,
         "years": body.year,
         "speakers": body.speaker,
+        "videos": body.video,
     }
     if body.query_properties is not None:
         kwargs["query_properties"] = body.query_properties
@@ -261,6 +263,7 @@ async def search_v(body: WeaviateSearchVectorBody):
         body.meetingType,
         body.year,
         body.speaker,
+        body.video,
     )
     # Verify objects & get return code
 

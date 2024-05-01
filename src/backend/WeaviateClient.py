@@ -40,23 +40,25 @@ def get_datatype(type_string):
     else:
         raise Exception("Incorrect data type")
 
-def get_filters(governments, meeting_types, years, speakers):
+def get_filters(governments, meeting_types, years, speakers, videos):
     filters = None
     # Removes empty string elements.
     governments = list(filter(lambda x: x != "", governments))
     meeting_types = list(filter(lambda x: x != "", meeting_types))
     years = list(filter(lambda x: x != "", years))
     speakers = list(filter(lambda x: x != "", speakers))
+    videos = list(filter(lambda x: x != "", videos))
 
     if filters is None and len(governments) > 0:
         filters = Filter.by_property("government").contains_any(governments)
     elif len(governments) > 0:
         filters = filters & Filter.by_property("government").contains_any(governments)
 
-    if filters is None and len(meeting_types) > 0:
-        filters = Filter.by_property("code").contains_any(meeting_types)
-    elif len(meeting_types) > 0:
-        filters = filters & Filter.by_property("code").contains_any(meeting_types)
+    # TODO: Enable
+    # if filters is None and len(meeting_types) > 0:
+    #     filters = Filter.by_property("code").contains_any(meeting_types)
+    # elif len(meeting_types) > 0:
+    #     filters = filters & Filter.by_property("code").contains_any(meeting_types)
 
     if filters is None and len(years) > 0:
         filters = Filter.by_property("year").contains_any(years)
@@ -67,6 +69,11 @@ def get_filters(governments, meeting_types, years, speakers):
     #     filters = Filter.by_property("speaker").contains_any(speakers)
     # elif len(speakers) > 0:
     #     filters = filters & Filter.by_property("speaker").contains_any(speakers)
+
+    if filters is None and len(videos) > 0:
+        filters = Filter.by_property("code").contains_any(videos)
+    elif len(videos) > 0:
+        filters = filters & Filter.by_property("code").contains_any(videos)
 
     return filters
 
@@ -168,13 +175,14 @@ class Weaviate:
         meeting_types,
         years,
         speakers,
+        videos,
         query_properties=["text^2", "bmContext"],
     ):
         c = self.client.collections.get(collection)
         response = c.query.bm25(
             query=query,
             limit=limit,
-            filters=get_filters(governments, meeting_types, years, speakers),
+            filters=get_filters(governments, meeting_types, years, speakers, videos),
             query_properties=query_properties,
             return_metadata=MetadataQuery(score=True),
         )
@@ -197,7 +205,15 @@ class Weaviate:
         return objs
 
     def search_vector(
-        self, collection, vector, limit, governments, meeting_types, years, speakers
+        self,
+        collection,
+        vector,
+        limit,
+        governments,
+        meeting_types,
+        years,
+        speakers,
+        videos,
     ):
         c = self.client.collections.get(collection)
 
@@ -205,7 +221,7 @@ class Weaviate:
         response = c.query.near_vector(
             near_vector=vector,
             limit=limit,
-            filters=get_filters(governments, meeting_types, years, speakers),
+            filters=get_filters(governments, meeting_types, years, speakers, videos),
             return_metadata=MetadataQuery(distance=True),
         )
         # TODO: Verify search was succeful
@@ -236,6 +252,7 @@ class Weaviate:
         meeting_types,
         years,
         speakers,
+        videos,
         query_properties=["text^2", "bmContext"],
     ):
         c = self.client.collections.get(collection)
@@ -243,7 +260,7 @@ class Weaviate:
             query=query,
             query_properties=query_properties,  # Play around with these settings.
             vector=vector,
-            filters=get_filters(governments, meeting_types, years, speakers),
+            filters=get_filters(governments, meeting_types, years, speakers, videos),
             return_metadata=MetadataQuery(score=True, explain_score=True),
             limit=limit,
         )

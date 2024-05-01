@@ -71,6 +71,7 @@ class WeaviateSearchHybridBody(BaseModel):
     meetingType: List[str]
     year: List[str]
     speaker: List[str]
+    video: List[str]
     query_properties: Optional[List[str]] = None
 
 class WeaviateSearchBM25Body(BaseModel):
@@ -81,6 +82,7 @@ class WeaviateSearchBM25Body(BaseModel):
     meetingType: List[str]
     year: List[str]
     speaker: List[str]
+    video: List[str]
     query_properties: Optional[List[str]] = None
 
 class WeaviateSearchVectorBody(BaseModel):
@@ -91,6 +93,7 @@ class WeaviateSearchVectorBody(BaseModel):
     meetingType: List[str]
     year: List[str]
     speaker: List[str]
+    video: List[str]
 
 class WeaviateDeleteCollectionBody(BaseModel):
     collection: str
