@@ -2,6 +2,8 @@ import json
 import os
 import torch
 
+import warnings
+
 from dotenv import load_dotenv
 
 from fastapi import FastAPI, HTTPException
@@ -37,6 +39,8 @@ from WeaviateClient import Weaviate
 from EmbedClient import SFRMistralEmbedder, MpnetEmbedder
 from LlmClient import MlxLlama
 
+warnings.filterwarnings("ignore")
+
 load_dotenv()
 
 device = "mps" if torch.backends.mps.is_available() else 'cuda' if torch.cuda.is_available() else "cpu"
@@ -52,16 +56,16 @@ whisper_client = None
 #     whisper_client = Torch_Transcriber()
 
 pyannote_client = None
-# print("Loading pyannote client")
-# pyannote_client = Pyannote(device)
+print("Loading pyannote client")
+pyannote_client = Pyannote(device)
 
 weaviate_client = None
-print("Loading Weaviate client")
-weaviate_client = Weaviate()
+# print("Loading Weaviate client")
+# weaviate_client = Weaviate()
 
 embed_client = None
-print("Loading embedding client")
-embed_client = MpnetEmbedder()
+# print("Loading embedding client")
+# embed_client = MpnetEmbedder()
 
 llm_client = None
 # print("Loading llm client")
@@ -320,7 +324,7 @@ async def chat():
 BASE_PATHS = [
     "/Volumes/Samsung_T5/data/",
     "/Volumes/Drive/data/",
-    "/Users/personal/Desktop/scriptie/notebooks/data/",
+    # "/Users/personal/Desktop/scriptie/notebooks/data/",
 ]
 @app.get("/api/gemeentes")
 async def get_gemeentes():
