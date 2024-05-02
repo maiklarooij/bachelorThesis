@@ -28,6 +28,7 @@ from UserTypes import (
     WeaviateSearchHybridBody,
     WeaviateSearchBM25Body,
     WeaviateSearchVectorBody,
+    WeaviateGetContext,
     WeaviateDeleteCollectionBody,
     AgendaBody,
     WhisperReturnCodes,
@@ -275,6 +276,21 @@ async def search_v(body: WeaviateSearchVectorBody):
     # Verify objects & get return code
 
     return { "status": "OK", "objects": objects }
+
+@app.post("/api/weaviate/getContext")
+async def get_speech_context(body: WeaviateGetContext):
+    if not weaviate_client:
+        raise HTTPException(status_code=503, detail="Weaviate client not active")
+
+    context_size = 3
+    min_speech_num = min(0, body.speechNum)
+    for speech_num in range(min_speech_num, min_speech_num+2*context_size):
+        print(speech_num)
+        # weaviate_client.get_context()
+
+    context = ""
+
+    return { "status": "OK", "context": context}
 
 
 # TODO: error handling

@@ -285,3 +285,29 @@ class Weaviate:
         ]
 
         return objs
+
+    def get_context(self, collection, government, meeting_type, year, video, speech_num):
+        c = self.client.collections.get(collection)
+
+        filters = (
+            Filter.by_property("government").equal(government)
+            & Filter.by_property("type").equal(meeting_type)
+            & Filter.by_property("year").equal(year)
+            & Filter.by_property("code").equal(video)
+            & Filter.by_property("speechNumber").equal(speech_num)
+        )
+
+        response = c.query.fetch_objects(
+            return_properties=["text"],
+            filters=filters,
+        )
+
+        objs = [
+            {
+                "properties": o.properties,
+                "uuid": str(o.uuid),
+            }
+            for o in response.objects
+        ]
+
+        return objs

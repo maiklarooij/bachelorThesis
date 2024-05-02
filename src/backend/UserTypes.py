@@ -98,6 +98,16 @@ class WeaviateSearchVectorBody(BaseModel):
     speaker: List[str]
     video: List[str]
 
+class WeaviateGetContext(BaseModel):
+    collection: str
+    government: str
+    meetingType: str
+    year: str
+    speaker: str
+    video: str
+    speechNum: int
+
+
 class WeaviateDeleteCollectionBody(BaseModel):
     collection: str
 
