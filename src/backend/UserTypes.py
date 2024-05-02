@@ -67,6 +67,7 @@ class WeaviateSearchHybridBody(BaseModel):
     vector: List[float]
     limit: int
     alpha: float
+    target_vec: str
     government: List[str]
     meetingType: List[str]
     year: List[str]
@@ -78,6 +79,7 @@ class WeaviateSearchBM25Body(BaseModel):
     collection: str
     query: str
     limit: int
+    target_vec: str
     government: List[str]
     meetingType: List[str]
     year: List[str]
@@ -89,6 +91,7 @@ class WeaviateSearchVectorBody(BaseModel):
     collection: str
     vector: List[float]
     limit: int
+    target_vec: str
     government: List[str]
     meetingType: List[str]
     year: List[str]

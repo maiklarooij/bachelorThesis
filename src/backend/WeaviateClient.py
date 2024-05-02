@@ -172,6 +172,7 @@ class Weaviate:
         query,
         limit,
         governments,
+        target_vec,
         meeting_types,
         years,
         speakers,
@@ -182,6 +183,7 @@ class Weaviate:
         response = c.query.bm25(
             query=query,
             limit=limit,
+            target_vector=target_vec,
             filters=get_filters(governments, meeting_types, years, speakers, videos),
             query_properties=query_properties,
             return_metadata=MetadataQuery(score=True),
@@ -210,6 +212,7 @@ class Weaviate:
         vector,
         limit,
         governments,
+        target_vec,
         meeting_types,
         years,
         speakers,
@@ -221,6 +224,7 @@ class Weaviate:
         response = c.query.near_vector(
             near_vector=vector,
             limit=limit,
+            target_vector=target_vec,
             filters=get_filters(governments, meeting_types, years, speakers, videos),
             return_metadata=MetadataQuery(distance=True),
         )
@@ -247,6 +251,7 @@ class Weaviate:
         query,
         vector,
         limit,
+        target_vec,
         alpha,
         governments,
         meeting_types,
@@ -259,10 +264,11 @@ class Weaviate:
         response = c.query.hybrid(
             query=query,
             query_properties=query_properties,  # Play around with these settings.
+            limit=limit,
+            target_vector=target_vec,
             vector=vector,
             filters=get_filters(governments, meeting_types, years, speakers, videos),
             return_metadata=MetadataQuery(score=True, explain_score=True),
-            limit=limit,
         )
 
         # print(response.objects)
