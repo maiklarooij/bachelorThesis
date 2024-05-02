@@ -60,41 +60,60 @@ def generate_history(system_prompt, newest_message, history):
 
     return prompt
 
-class MlxLlama():
-    def __init__(self, model_name="mlx-community/Meta-Llama-3-8B-Instruct-4bit"):
+class LLM():
+    def __init__(self, model_name):
         model, tokenizer = load(model_name)
         self.model = model
         self.tokenizer = tokenizer
 
+
+class MlxLlama(LLM):
+    # TODO instead of complete_prompt history and the convert history to prompt here
     def run(self, complete_prompt):
         response = generate(
             self.model,
             self.tokenizer,
             prompt=complete_prompt,
             # verbose=True,
-            max_tokens=99999,
+            max_tokens=10000,
         )
 
         return response
 
+class MlxPhi(LLM):
+    def run(self, history):
+        response = generate(self.model, self.tokenizer, prompt="hello", verbose=True)
+
+        return response
+
+
+# transcript =
+# agenda_punten = x
 
 
 if __name__ == "__main__":
-    llm = MlxLlama(model_name="mlx-community/Meta-Llama-3-8B-Instruct-8bit")
+    # llm = MlxLlama(model_name="mlx-community/Llama-3-8b-64k-PoSE-4bit")
+    # llm = MlxLlama(model_name="mlx-community/Meta-Llama-3-8B-Instruct-8bit")
+    llm = MlxLlama("mlx-community/dolphin-2.9-llama3-8b-1m-4bit")
+
+    # llm = MlxPhi("mlx-community/Phi-3-mini-128k-instruct-8bit")
+
     prompt = Prompter(system_prompt="You are a helpful assistant. Be proffesional and think before you answer.")
 
-    # start = time.time()
-    q = "What flavour does not fit in the following sequence? chocolate, ice cream, apple, bubble gum, lollypop"
+
+
+    start = time.time()
+    q = "Gegeven de volgende vijf onderwerpen, welke past er niet bij? Appel, Coca cola, Pepsi, Water, Appelsap"
     prompt.add_question(q)
     a = llm.run(prompt.prompt)
     prompt.add_answer(a)
-    # print(f"Prompt took {time.time()-start} seconds")
+    print(f"Prompt took {time.time()-start} seconds")
 
     # start = time.time()
-    q = "What is a famous dish with this flavour?"
-    prompt.add_question(q)
-    a = llm.run(prompt.prompt)
-    prompt.add_answer(a)
+    # q = "What is a famous dish with this flavour?"
+    # prompt.add_question(q)
+    # a = llm.run(prompt.prompt)
+    # prompt.add_answer(a)
     # print(f"Prompt took {time.time()-start} seconds")
 
     # start = time.time()
