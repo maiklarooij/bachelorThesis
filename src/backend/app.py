@@ -58,15 +58,15 @@ whisper_client = None
 
 pyannote_client = None
 print("Loading pyannote client")
-pyannote_client = Pyannote(device)
+# pyannote_client = Pyannote(device)
 
 weaviate_client = None
-# print("Loading Weaviate client")
-# weaviate_client = Weaviate()
+print("Loading Weaviate client")
+weaviate_client = Weaviate()
 
 embed_client = None
-# print("Loading embedding client")
-# embed_client = MpnetEmbedder()
+print("Loading embedding client")
+embed_client = MpnetEmbedder()
 
 llm_client = None
 # print("Loading llm client")
@@ -342,7 +342,7 @@ async def chat():
 
 BASE_PATHS = [
     "/Volumes/Samsung_T5/data/",
-    "/Volumes/Drive/data/",
+    # "/Volumes/Drive/data/",
     # "/Users/personal/Desktop/scriptie/notebooks/data/",
 ]
 @app.get("/api/gemeentes")

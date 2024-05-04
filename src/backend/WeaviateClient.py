@@ -55,20 +55,21 @@ def get_filters(governments, meeting_types, years, speakers, videos):
         filters = filters & Filter.by_property("government").contains_any(governments)
 
     # TODO: Enable
-    # if filters is None and len(meeting_types) > 0:
-    #     filters = Filter.by_property("code").contains_any(meeting_types)
-    # elif len(meeting_types) > 0:
-    #     filters = filters & Filter.by_property("code").contains_any(meeting_types)
+    print("TYPES: ", meeting_types)
+    if filters is None and len(meeting_types) > 0:
+        filters = Filter.by_property("type").contains_any(meeting_types)
+    elif len(meeting_types) > 0:
+        filters = filters & Filter.by_property("type").contains_any(meeting_types)
 
     if filters is None and len(years) > 0:
         filters = Filter.by_property("year").contains_any(years)
     elif len(years) > 0:
         filters = filters & Filter.by_property("year").contains_any(years)
 
-    # if filters is None and len(speakers) > 0:
-    #     filters = Filter.by_property("speaker").contains_any(speakers)
-    # elif len(speakers) > 0:
-    #     filters = filters & Filter.by_property("speaker").contains_any(speakers)
+    if filters is None and len(speakers) > 0:
+        filters = Filter.by_property("speaker").contains_any(speakers)
+    elif len(speakers) > 0:
+        filters = filters & Filter.by_property("speaker").contains_any(speakers)
 
     if filters is None and len(videos) > 0:
         filters = Filter.by_property("code").contains_any(videos)
@@ -119,13 +120,13 @@ class Weaviate:
                 Property(name=p.name, data_type=get_datatype(p.data_type))
                 for i, p in enumerate(config.properties)
             ],
-            vectorizer_config=[
-                Configure.NamedVectors.none(name="text"),
-                Configure.NamedVectors.none(name="speaker"),
-            ],
-            # vector_index_config=Configure.VectorIndex.hnsw()
-            # if config.vector_index_hnsw
-            # else Configure.VectorIndex.flat(),
+            # vectorizer_config=[
+            #     Configure.NamedVectors.none(name="text"),
+            #     Configure.NamedVectors.none(name="speaker"),
+            # ],
+            vector_index_config=Configure.VectorIndex.hnsw()
+            if config.vector_index_hnsw
+            else Configure.VectorIndex.flat(),
         )
 
 
@@ -175,19 +176,19 @@ class Weaviate:
         collection,
         query,
         limit,
-        governments,
         target_vec,
+        governments,
         meeting_types,
         years,
         speakers,
         videos,
-        query_properties=["text^2", "bmContext"],
+        query_properties=["text^2"],
     ):
         c = self.client.collections.get(collection)
         response = c.query.bm25(
             query=query,
             limit=limit,
-            target_vector=target_vec,
+            # target_vector=target_vec,
             filters=get_filters(governments, meeting_types, years, speakers, videos),
             query_properties=query_properties,
             return_metadata=MetadataQuery(score=True),
@@ -215,8 +216,8 @@ class Weaviate:
         collection,
         vector,
         limit,
-        governments,
         target_vec,
+        governments,
         meeting_types,
         years,
         speakers,
@@ -262,7 +263,7 @@ class Weaviate:
         years,
         speakers,
         videos,
-        query_properties=["text^2", "bmContext"],
+        query_properties=["text^2"],
     ):
         c = self.client.collections.get(collection)
         response = c.query.hybrid(
