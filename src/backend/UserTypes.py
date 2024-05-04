@@ -120,3 +120,6 @@ class AgendaBody(BaseModel):
 
 class ChatBody(BaseModel):
     history: List[Dict[Any, Any]]
+
+class TranslateBody(BaseModel):
+    text: str

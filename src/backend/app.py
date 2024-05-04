@@ -33,6 +33,7 @@ from UserTypes import (
     AgendaBody,
     WhisperReturnCodes,
     ChatBody,
+    TranslateBody,
 )
 
 from WhisperClient import MLX_Transcriber, Torch_Transcriber
@@ -350,12 +351,35 @@ async def agenda(body: AgendaBody):
 
 
 @app.post("/api/chat")
-# Body should contain new question, system prompt and history of previous qa's
 async def chat(body: ChatBody):
     if not llm_client:
         raise HTTPException(status_code=503, detail="Llm client not active")
 
     resp = llm_client.run(body.history)
+    print(resp)
+
+    return { "status": "OK", "response": resp }
+
+
+# Translates Dutch to English
+@app.post("/api/translateDE")
+async def translate_d_e(body: TranslateBody):
+    if not t5_client:
+        raise HTTPException(status_code=503, detail="T5 translate client not active")
+
+    resp = t5_client.dutch_to_english(body.text)
+    print(resp)
+
+    return { "status": "OK", "response": resp }
+
+
+# Translates English to Dutch
+@app.post("/api/translateDE")
+async def translate_e_d(body: TranslateBody):
+    if not t5_client:
+        raise HTTPException(status_code=503, detail="T5 translate client not active")
+
+    resp = t5_client.english_to_dutch(body.text)
     print(resp)
 
     return { "status": "OK", "response": resp }
