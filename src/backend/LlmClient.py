@@ -60,6 +60,21 @@ def generate_history(system_prompt, newest_message, history):
 
     return prompt
 
+
+def history_to_prompt(history):
+    prompt = ""
+    for m in history:
+        if m["role"] == "system":
+            prompt += generate_system_prompt(m["content"])
+        if m["role"] == "user":
+            prompt += generate_user_prompt(m["content"])
+        elif m["role"] == "assistant":
+            prompt += generate_assistant_prompt(m["content"])
+
+    prompt += f"{ASSISTENT}\n\n"
+
+    return prompt
+
 class LLM():
     def __init__(self, model_name):
         model, tokenizer = load(model_name)
@@ -68,12 +83,11 @@ class LLM():
 
 
 class MlxLlama(LLM):
-    # TODO instead of complete_prompt history and the convert history to prompt here
-    def run(self, complete_prompt):
+    def run(self, history):
         response = generate(
             self.model,
             self.tokenizer,
-            prompt=complete_prompt,
+            prompt=history_to_prompt(history),
             # verbose=True,
             max_tokens=10000,
         )
@@ -87,44 +101,40 @@ class MlxPhi(LLM):
         return response
 
 
-# transcript =
-# agenda_punten = x
+# if __name__ == "__main__":
+#     # llm = MlxLlama(model_name="mlx-community/Llama-3-8b-64k-PoSE-4bit")
+#     # llm = MlxLlama(model_name="mlx-community/Meta-Llama-3-8B-Instruct-8bit")
+#     llm = MlxLlama("mlx-community/dolphin-2.9-llama3-8b-1m-4bit")
 
+#     # llm = MlxPhi("mlx-community/Phi-3-mini-128k-instruct-8bit")
 
-if __name__ == "__main__":
-    # llm = MlxLlama(model_name="mlx-community/Llama-3-8b-64k-PoSE-4bit")
-    # llm = MlxLlama(model_name="mlx-community/Meta-Llama-3-8B-Instruct-8bit")
-    llm = MlxLlama("mlx-community/dolphin-2.9-llama3-8b-1m-4bit")
-
-    # llm = MlxPhi("mlx-community/Phi-3-mini-128k-instruct-8bit")
-
-    prompt = Prompter(system_prompt="You are a helpful assistant. Be proffesional and think before you answer.")
+#     prompt = Prompter(system_prompt="You are a helpful assistant. Be proffesional and think before you answer.")
 
 
 
-    start = time.time()
-    q = "Gegeven de volgende vijf onderwerpen, welke past er niet bij? Appel, Coca cola, Pepsi, Water, Appelsap"
-    prompt.add_question(q)
-    a = llm.run(prompt.prompt)
-    prompt.add_answer(a)
-    print(f"Prompt took {time.time()-start} seconds")
+#     start = time.time()
+#     q = "Gegeven de volgende vijf onderwerpen, welke past er niet bij? Appel, Coca cola, Pepsi, Water, Appelsap"
+#     prompt.add_question(q)
+#     a = llm.run(prompt.prompt)
+#     prompt.add_answer(a)
+#     print(f"Prompt took {time.time()-start} seconds")
 
-    # start = time.time()
-    # q = "What is a famous dish with this flavour?"
-    # prompt.add_question(q)
-    # a = llm.run(prompt.prompt)
-    # prompt.add_answer(a)
-    # print(f"Prompt took {time.time()-start} seconds")
+#     # start = time.time()
+#     # q = "What is a famous dish with this flavour?"
+#     # prompt.add_question(q)
+#     # a = llm.run(prompt.prompt)
+#     # prompt.add_answer(a)
+#     # print(f"Prompt took {time.time()-start} seconds")
 
-    # start = time.time()
-    # q = "Give me the instructions to make it."
-    # prompt.add_message(q)
-    # a = llm.run(prompt.prompt)
-    # prompt.add_message(a)
+#     # start = time.time()
+#     # q = "Give me the instructions to make it."
+#     # prompt.add_message(q)
+#     # a = llm.run(prompt.prompt)
+#     # prompt.add_message(a)
 
-    # print(a)
-    # print(f"Prompt took {time.time()-start} seconds")
+#     # print(a)
+#     # print(f"Prompt took {time.time()-start} seconds")
 
-    # start = time.time()
-    prompt.pretty_print()
-    # print(f"Printing prompt took {time.time()-start} seconds")
+#     # start = time.time()
+#     prompt.pretty_print()
+#     # print(f"Printing prompt took {time.time()-start} seconds")

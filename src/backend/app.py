@@ -32,6 +32,7 @@ from UserTypes import (
     WeaviateDeleteCollectionBody,
     AgendaBody,
     WhisperReturnCodes,
+    ChatBody,
 )
 
 from WhisperClient import MLX_Transcriber, Torch_Transcriber
@@ -49,28 +50,28 @@ print(f"Running on {device}")
 
 # TODO: check if cuda/ mlx is available and initialise based on that
 whisper_client = None
-# if device == "mps":
-#     print("Loading whisper MLX client")
-#     whisper_client = MLX_Transcriber(os.environ.get("MLX_WHISPER_MODEL"))
-# else:
-#     print("Loading whisper Torch client")
-#     whisper_client = Torch_Transcriber()
+if device == "mps":
+    print("Loading whisper MLX client")
+    whisper_client = MLX_Transcriber(os.environ.get("MLX_WHISPER_MODEL"))
+else:
+    print("Loading whisper Torch client")
+    whisper_client = Torch_Transcriber()
 
 pyannote_client = None
 # print("Loading pyannote client")
 # pyannote_client = Pyannote(device)
 
 weaviate_client = None
-print("Loading Weaviate client")
-weaviate_client = Weaviate()
+# print("Loading Weaviate client")
+# weaviate_client = Weaviate()
 
 embed_client = None
-print("Loading embedding client")
-embed_client = MpnetEmbedder()
+# print("Loading embedding client")
+# embed_client = MpnetEmbedder()
 
 llm_client = None
 # print("Loading llm client")
-# llm_client = MlxLlama(model_name="mlx-community/Meta-Llama-3-8B-Instruct-8bit")
+# llm_client = MlxLlama(model_name="mlx-community/dolphin-2.9-llama3-8b-1m-4bit")
 
 app = FastAPI()
 
@@ -335,9 +336,14 @@ async def agenda(body: AgendaBody):
 
 @app.post("/api/chat")
 # Body should contain new question, system prompt and history of previous qa's
-async def chat():
+async def chat(body: ChatBody):
     if not llm_client:
         raise HTTPException(status_code=503, detail="Llm client not active")
+
+    resp = llm_client.run(body.history)
+    print(resp)
+
+    return { "status": "OK", "response": resp }
 
 
 BASE_PATHS = [
@@ -528,7 +534,7 @@ async def get_video_transcript(gemeente: str, meetingType: str, year: str, video
 
     with open(transcript_path, "r") as f:
         data = json.load(f)
-
     transcript = data.get("text")
+    print(transcript)
 
     return {"status": "OK", "transcript": transcript}

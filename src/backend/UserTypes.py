@@ -117,3 +117,6 @@ class EmbedBody(BaseModel):
 class AgendaBody(BaseModel):
     full_text: str
     agenda_points: List[Dict[str, str]]
+
+class ChatBody(BaseModel):
+    history: List[Dict[Any, Any]]
