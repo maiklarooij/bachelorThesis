@@ -54,8 +54,6 @@ def get_filters(governments, meeting_types, years, speakers, videos):
     elif len(governments) > 0:
         filters = filters & Filter.by_property("government").contains_any(governments)
 
-    # TODO: Enable
-    print("TYPES: ", meeting_types)
     if filters is None and len(meeting_types) > 0:
         filters = Filter.by_property("type").contains_any(meeting_types)
     elif len(meeting_types) > 0:
@@ -266,8 +264,10 @@ class Weaviate:
         query_properties=["text^2"],
     ):
         c = self.client.collections.get(collection)
+        print(alpha)
         response = c.query.hybrid(
             query=query,
+            alpha=alpha,
             query_properties=query_properties,  # Play around with these settings.
             limit=limit,
             target_vector=target_vec,

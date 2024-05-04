@@ -57,7 +57,7 @@ whisper_client = None
 #     whisper_client = Torch_Transcriber()
 
 pyannote_client = None
-print("Loading pyannote client")
+# print("Loading pyannote client")
 # pyannote_client = Pyannote(device)
 
 weaviate_client = None
