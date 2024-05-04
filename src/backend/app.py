@@ -40,6 +40,7 @@ from PyannoteClient import Pyannote
 from WeaviateClient import Weaviate
 from EmbedClient import SFRMistralEmbedder, MpnetEmbedder
 from LlmClient import MlxLlama
+from T5Client import T5
 
 warnings.filterwarnings("ignore")
 
@@ -50,28 +51,33 @@ print(f"Running on {device}")
 
 # TODO: check if cuda/ mlx is available and initialise based on that
 whisper_client = None
-if device == "mps":
-    print("Loading whisper MLX client")
-    whisper_client = MLX_Transcriber(os.environ.get("MLX_WHISPER_MODEL"))
-else:
-    print("Loading whisper Torch client")
-    whisper_client = Torch_Transcriber()
+# if device == "mps":
+#     print("Loading whisper MLX client")
+#     whisper_client = MLX_Transcriber(os.environ.get("MLX_WHISPER_MODEL"))
+# else:
+#     print("Loading whisper Torch client")
+#     whisper_client = Torch_Transcriber()
 
 pyannote_client = None
 # print("Loading pyannote client")
 # pyannote_client = Pyannote(device)
 
 weaviate_client = None
-# print("Loading Weaviate client")
-# weaviate_client = Weaviate()
+print("Loading Weaviate client")
+weaviate_client = Weaviate()
 
 embed_client = None
-# print("Loading embedding client")
-# embed_client = MpnetEmbedder()
+print("Loading embedding client")
+embed_client = MpnetEmbedder()
 
 llm_client = None
 # print("Loading llm client")
 # llm_client = MlxLlama(model_name="mlx-community/dolphin-2.9-llama3-8b-1m-4bit")
+
+t5_client = None
+# print("Loading T5 client")
+# t5_client = T5(model_name="google-t5/t5-large")
+
 
 app = FastAPI()
 
@@ -328,10 +334,19 @@ async def embed(body: EmbedBody):
 async def agenda(body: AgendaBody):
     if not llm_client:
         raise HTTPException(status_code=503, detail="Llm client not active")
+    if not t5_client:
+        raise HTTPException(status_code=503, detail="T5 translate client not active")
 
     # TODO Split body.full_text in 6k token windows (with a bit of overlap)
-    agenda_points = [p["agendaPoint"] for p in body.agenda_points]
-    prompt = "Gegeven het volgende transcript van een gemeente vergadering en een lijst met agenda punten, per agenda punt aan bij welke zin ze beginnen. De tekst is opgedeeld in kleinere stukken, dus niet alle agenda punten hoeven aan bod te komen."
+    agenda_points = [
+        t5_client.dutch_to_english(p["agendaPoint"]) for p in body.agenda_points
+    ]
+    prompt = t5_client.dutch_to_english(
+        "Gegeven het volgende transcript van een gemeente vergadering en een lijst met agenda punten, per agenda punt aan bij welke zin ze beginnen. De tekst is opgedeeld in kleinere stukken, dus niet alle agenda punten hoeven aan bod te komen."
+    )
+
+    print(agenda_points)
+    print(prompt)
 
 
 @app.post("/api/chat")
