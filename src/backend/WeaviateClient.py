@@ -111,17 +111,21 @@ class Weaviate:
 
     # TODO: Distance metric & error handling.
     def create_collection(self, config):
-        for i, p in enumerate(config.properties):
-            Property(name=p.name, data_type=get_datatype(p.data_type), )
+        # for i, p in enumerate(config.properties):
+        #     Property(name=p.name, data_type=get_datatype(p.data_type), )
         self.client.collections.create(
             config.name,
             properties=[
                 Property(name=p.name, data_type=get_datatype(p.data_type))
                 for i, p in enumerate(config.properties)
             ],
-            vector_index_config=Configure.VectorIndex.hnsw()
-            if config.vector_index_hnsw
-            else Configure.VectorIndex.flat(),
+            vectorizer_config=[
+                Configure.NamedVectors.none(name="text"),
+                Configure.NamedVectors.none(name="speaker"),
+            ],
+            # vector_index_config=Configure.VectorIndex.hnsw()
+            # if config.vector_index_hnsw
+            # else Configure.VectorIndex.flat(),
         )
 
 
