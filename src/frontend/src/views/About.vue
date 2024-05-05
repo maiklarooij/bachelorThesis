@@ -16,5 +16,20 @@
             Currently, thousands of hours of video and audio from more than five different municipalities have been
             analyzed by way of transcribing, speaker diorization, speech embedding and the use of large language models.
         </p>
+        <p class="my-3 max-w-2xl">
+            For municipaities to join, their meetings must be hosted with one of two different organizations:
+            <a href="https://www.notubiz.nl/">Notubiz </a>
+            and
+            <a href="https://www.ibabs.com/nl/publieksportaal/">iBABS</a>
+            . At this moment, participating municipalities are
+            <a href="https://gemeentebestuur-haarlem.notubiz.nl/">Haarlem</a>
+            ,
+            <a href="https://ridderkerk.notubiz.nl/">Ridderkerk</a>
+            ,
+            <a href="https://hoekschewaard.notubiz.nl/">Hoekschewaard</a>
+            and
+            <a href="https://barendrecht.raadsinformatie.nl/">barendrecht</a>
+            .
+        </p>
     </div>
 </template>
