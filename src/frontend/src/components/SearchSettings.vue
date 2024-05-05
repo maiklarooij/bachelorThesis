@@ -1,0 +1,123 @@
+<script setup>
+import { ref, watch } from 'vue';
+
+const emit = defineEmits(['newGemeenteToSearch', 'newMeetingTypeToSearch', 'newMeetingYearToSearch', 'newSpeakerToSearch', 'newSearchMethod', 'newSearchLimit', 'newSearchalpha'])
+
+defineProps({
+    gemeentes: Array,
+    searchGemeenteActive: Boolean,
+    searchTypeActive: Boolean,
+    searchYearActive: Boolean,
+    availableSpeakersProp: Array,
+})
+
+const searchMethod = ref("vector");
+const searchLimit = ref(10);
+const searchalpha = ref(0.5);
+const searchGemeente = ref("");
+const availableTypes = ref([]);
+const searchType     = ref("");
+const availableYears = ref([]);
+const searchYear     = ref("");
+const availableSpeakers = ref([]);
+const searchSpeaker     = ref("");
+
+
+watch(searchMethod, (searchMethod, _) => {
+    emit("newSearchMethod", searchMethod)
+})
+
+watch(searchalpha, (searchalpha, _) => {
+    emit("newSearchalpha", searchalpha)
+})
+
+watch(searchLimit, (searchLimit, _) => {
+    emit("newSearchLimit", searchLimit)
+})
+
+watch(searchGemeente, (searchGemeente, _) => {
+    fetch(`http://127.0.0.1:3012/api/gemeenteMeetingTypes?gemeente=${searchGemeente}`)
+        .then(response => response.json())
+        .then(data => availableTypes.value = data.types)
+
+    emit("newGemeenteToSearch", searchGemeente)
+})
+
+watch(searchType, (searchType, _) => {
+    // console.log(searchType)
+    fetch(`http://127.0.0.1:3012/api/gemeenteYears?gemeente=${searchGemeente.value}&meetingType=${searchType}`)
+        .then(response => response.json())
+        .then(data => availableYears.value = data.years)
+
+    emit("newMeetingTypeToSearch", searchType)
+})
+
+watch(searchYear, (searchYear, _) => {
+    // console.log(searchYear)
+    // fetch(`http://127.0.0.1:3012/api/gemeenteYears?gemeente=${searchGemeente.value}&meetingType=${searchType}`)
+    //     .then(response => response.json())
+    //     .then(data => availableYears.value = data.years)
+
+    emit("newMeetingYearToSearch", searchYear)
+})
+
+watch(searchSpeaker, (searchSpeaker, _) => {
+    // console.log(searchSpeaker)
+    // fetch(`http://127.0.0.1:3012/api/gemeenteYears?gemeente=${searchGemeente.value}&meetingType=${searchType}`)
+    //     .then(response => response.json())
+    //     .then(data => availableYears.value = data.years)
+
+    emit("newSpeakerToSearch", searchSpeaker)
+})
+
+</script>
+
+<template>
+    <div class="flex gap-x-4 justify-center py-5">
+
+        <!-- search method picker -->
+        <select v-model="searchMethod" class="p-2 text-center">
+            <option value="vector">vector</option>
+            <option>bm25</option>
+            <option>hybrid</option>
+        </select>
+
+        <input v-if="searchMethod === 'hybrid'" type="number" min="0.1" max="1.0" step="0.05"
+            class="px-3 w-20" v-model="searchalpha">
+
+        <input type="number" min="1" max="50" step="1" value="1" class="px-3 w-20" v-model="searchLimit">
+
+        <!-- Gemeente picker -->
+        <select v-if="searchGemeenteActive" v-model="searchGemeente" class="p-2 text-center">
+            <option disabled value="">Gemeente</option>
+            <option v-for="t in gemeentes">
+                {{t.gemeente}}
+            </option>
+        </select>
+
+        <!-- Type picker -->
+        <select v-if="searchTypeActive" v-model="searchType" class="p-2 text-center">
+            <option disabled value="">Type</option>
+            <option v-for="t in availableTypes">
+                {{ t.type }}
+            </option>
+
+        </select>
+
+        <!-- Year picker -->
+        <select v-if="searchYearActive" v-model="searchYear" class="p-2 text-center">
+            <option disabled value="">Year</option>
+            <option v-for="y in availableYears">
+                {{ y.year }}
+            </option>
+        </select>
+
+        <!-- Year picker -->
+        <select v-model="searchSpeaker" class="p-2 text-center">
+            <option disabled value="">Speaker</option>
+            <option v-for="s in availableSpeakersProp">
+                {{ s }}
+            </option>
+        </select>
+    </div>
+</template>
