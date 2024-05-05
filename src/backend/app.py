@@ -354,9 +354,32 @@ async def agenda(body: AgendaBody):
 async def chat(body: ChatBody):
     if not llm_client:
         raise HTTPException(status_code=503, detail="Llm client not active")
+    if not weaviate_client:
+        raise HTTPException(status_code=503, detail="Weaviate client not active")
+    if not embed_client:
+        raise HTTPException(status_code=503, detail="Embed client not active")
 
-    resp = llm_client.run(body.history)
-    print(resp)
+    # TODO: check if works?
+    r = weaviate_client.search_hybrid(
+        "TranscriptsV2",
+        body.question,
+        embed_client.embed(body.question),
+        1,
+        "text",
+        0.4,
+        [body.government],
+        [body.meeting_type],
+        [body.year],
+        [], # Speakers, todo later
+        [body.video],
+    )
+    context = r[0]["properties"]["text"]
+    # TODO use get context weaviate serch function to get surrounding context from the number one found by hyrbis search
+
+    history = body.history
+    history[-1]["content"] = f'{history[-1]["content"]}\n\nContext: {context}'
+
+    resp = llm_client.run(history)
 
     return { "status": "OK", "response": resp }
 
@@ -574,6 +597,5 @@ async def get_video_transcript(gemeente: str, meetingType: str, year: str, video
     with open(transcript_path, "r") as f:
         data = json.load(f)
     transcript = data.get("text")
-    print(transcript)
 
     return {"status": "OK", "transcript": transcript}

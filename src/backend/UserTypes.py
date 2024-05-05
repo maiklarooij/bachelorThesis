@@ -120,6 +120,11 @@ class AgendaBody(BaseModel):
 
 class ChatBody(BaseModel):
     history: List[Dict[Any, Any]]
+    government: str
+    meeting_type: str
+    year: str
+    video: str
+    question: str
 
 class TranslateBody(BaseModel):
     text: str
