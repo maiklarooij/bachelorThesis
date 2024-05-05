@@ -17,7 +17,7 @@ function handleClick() {
 
     <div class="flex flex-col p-3 ">
         <div>
-            <div @click="handleClick" style="color: #99c3ff;" class=" hover:underline font-bold text-lg my-1">
+            <div @click="handleClick" class="text-blue-300 hover:underline font-bold text-lg my-1">
                 Gemeente {{ gemeente }}
             </div>
             <div class="my-1">
