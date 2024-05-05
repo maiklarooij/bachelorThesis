@@ -10,9 +10,9 @@
 
         </div>
         <div class="flex gap-x-8 justify-center py-5">
-            <router-link to="/">Home</router-link>
+            <router-link to="/">Video archive</router-link>
             <router-link to="/search">Search</router-link>
-            <router-link to="/chat">Chat</router-link>
+            <!-- <router-link to="/chat">Chat</router-link> -->
             <router-link to="/about">About</router-link>
         </div>
         <div>

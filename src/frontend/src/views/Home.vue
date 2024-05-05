@@ -20,10 +20,9 @@ function goToGemeente(gemeente, path) {
 
 <template>
 
-    <div class="grid grid-cols-5 gap-4">
-
+    <div style="width: 600px;" class="flex flex-col text-left">
         <GemeenteCard v-for="g in gemeentes" :gemeente="g.gemeente" :num_vids="g.videos" class="hover: cursor-pointer"
-            @click="goToGemeente(g.gemeente, g.path)" />
+            @clicked="goToGemeente(g.gemeente, g.path)" />
     </div>
 
 </template>
