@@ -34,6 +34,7 @@ from UserTypes import (
     WhisperReturnCodes,
     ChatBody,
     TranslateBody,
+    WeaviateGetSpeakerNameBody,
 )
 
 from WhisperClient import MLX_Transcriber, Torch_Transcriber
@@ -68,8 +69,8 @@ print("Loading Weaviate client")
 weaviate_client = Weaviate()
 
 embed_client = None
-print("Loading embedding client")
-embed_client = MpnetEmbedder()
+# print("Loading embedding client")
+# embed_client = MpnetEmbedder()
 
 llm_client = None
 # print("Loading llm client")
@@ -299,6 +300,15 @@ async def get_speech_context(body: WeaviateGetContext):
     context = ""
 
     return { "status": "OK", "context": context}
+
+@app.post("/api/weaviate/getSpeakerName")
+async def get_speaker_name(body: WeaviateGetSpeakerNameBody):
+    if not weaviate_client:
+        raise HTTPException(status_code=503, detail="Weaviate client not active")
+
+    name = weaviate_client.get_speaker_name("TranscriptsV2", "Speakers", body.code, body.speakerID)
+
+    return { "status": "OK", "name": name }
 
 
 # TODO: error handling

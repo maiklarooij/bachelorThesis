@@ -316,3 +316,29 @@ class Weaviate:
         ]
 
         return objs
+
+    def get_speaker_name(self, transcript_collection, speaker_collection, video, speakerID):
+        tc = self.client.collections.get(transcript_collection)
+        filters = (
+            Filter.by_property("code").equal(video)
+            & Filter.by_property("speaker").equal(speakerID)
+        )
+        response = tc.query.fetch_objects(
+            filters=filters,
+            # with_vector=True,
+        )
+        print(response)
+        if len(response.objects) == 0:
+            print("NOTHING FOUND!")
+            # TODO: return error
+
+        # speech_vector = response.objects[0]
+        speech_vector = []
+        sc = self.client.collections.get(speaker_collection)
+        speaker_response = sc.query.near_vector(
+            near_vector=speech_vector,
+            return_properties=["name"],
+        )
+
+        print(speaker_response)
+        # TODO: finish

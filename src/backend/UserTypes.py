@@ -111,6 +111,10 @@ class WeaviateGetContext(BaseModel):
 class WeaviateDeleteCollectionBody(BaseModel):
     collection: str
 
+class WeaviateGetSpeakerNameBody(BaseModel):
+    code: str
+    speakerID: str
+
 class EmbedBody(BaseModel):
     text: List[str]
 
