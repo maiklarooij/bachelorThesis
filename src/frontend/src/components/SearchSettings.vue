@@ -9,6 +9,7 @@ defineProps({
     searchTypeActive: Boolean,
     searchYearActive: Boolean,
     availableSpeakersProp: Array,
+    availableAgenda: Array,
 })
 
 const searchMethod = ref("vector");
@@ -76,19 +77,19 @@ watch(searchSpeaker, (searchSpeaker, _) => {
     <div class="flex gap-x-4 justify-center py-5">
 
         <!-- search method picker -->
-        <select v-model="searchMethod" class="p-2 text-center">
+        <select v-model="searchMethod" class="p-2 text-center max-w-28">
             <option value="vector">vector</option>
             <option>bm25</option>
             <option>hybrid</option>
         </select>
 
-        <input v-if="searchMethod === 'hybrid'" type="number" min="0.1" max="1.0" step="0.05"
-            class="px-3 w-20" v-model="searchalpha">
+        <input v-if="searchMethod === 'hybrid'" type="number" min="0.1" max="1.0" step="0.05" class="px-3 w-20"
+            v-model="searchalpha">
 
         <input type="number" min="1" max="50" step="1" value="1" class="px-3 w-20" v-model="searchLimit">
 
         <!-- Gemeente picker -->
-        <select v-if="searchGemeenteActive" v-model="searchGemeente" class="p-2 text-center">
+        <select v-if="searchGemeenteActive" v-model="searchGemeente" class="p-2 text-center max-w-28">
             <option disabled value="">Gemeente</option>
             <option v-for="t in gemeentes">
                 {{t.gemeente}}
@@ -96,7 +97,7 @@ watch(searchSpeaker, (searchSpeaker, _) => {
         </select>
 
         <!-- Type picker -->
-        <select v-if="searchTypeActive" v-model="searchType" class="p-2 text-center">
+        <select v-if="searchTypeActive" v-model="searchType" class="p-2 text-center max-w-28">
             <option disabled value="">Type</option>
             <option v-for="t in availableTypes">
                 {{ t.type }}
@@ -105,18 +106,26 @@ watch(searchSpeaker, (searchSpeaker, _) => {
         </select>
 
         <!-- Year picker -->
-        <select v-if="searchYearActive" v-model="searchYear" class="p-2 text-center">
+        <select v-if="searchYearActive" v-model="searchYear" class="p-2 text-center max-w-28">
             <option disabled value="">Year</option>
             <option v-for="y in availableYears">
                 {{ y.year }}
             </option>
         </select>
 
-        <!-- Year picker -->
-        <select v-model="searchSpeaker" class="p-2 text-center">
+        <!-- speaker picker -->
+        <select v-model="searchSpeaker" class="p-2 text-center max-w-28">
             <option disabled value="">Speaker</option>
             <option v-for="s in availableSpeakersProp">
                 {{ s }}
+            </option>
+        </select>
+
+        <!-- speaker picker -->
+        <select v-if="availableAgenda" v-model="searchSpeaker" class="p-2 text-center max-w-28">
+            <option disabled value="">Agenda</option>
+            <option v-for="a in availableAgenda">
+                {{ a.agendaPoint }}
             </option>
         </select>
     </div>

@@ -4,7 +4,7 @@ import { ref, watch } from 'vue';
 const searchQuery = ref("")
 const searchResults = ref([])
 
-const emit = defineEmits(["newResults"])
+const emit = defineEmits(["newResults", "newQuery"])
 
 const props = defineProps({
     limit: Number,
@@ -188,6 +188,8 @@ async function clickSearch() {
     } else if (props.method == "hybrid") {
         await hybridSearch() // TODO idk of dit helemaal goed werktx
     }
+
+    emit("newQuery", searchQuery.value)
 }
 
 </script>

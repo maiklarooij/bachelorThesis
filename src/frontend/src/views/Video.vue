@@ -265,7 +265,7 @@ function goToOriginalVideo() {
                         </div>
                     </div>
 
-                    <SearchVideo :speakers="speakers" class="my-4"></SearchVideo>
+                    <SearchVideo v-if="speakers.length>0" :speakers="speakers" :agenda="agenda" class="my-4"></SearchVideo>
                 </div>
 
             </div>
