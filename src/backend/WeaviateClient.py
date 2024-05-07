@@ -325,20 +325,24 @@ class Weaviate:
         )
         response = tc.query.fetch_objects(
             filters=filters,
-            # with_vector=True,
+            limit=1,
+            include_vector=True,
         )
-        print(response)
         if len(response.objects) == 0:
             print("NOTHING FOUND!")
             # TODO: return error
 
-        # speech_vector = response.objects[0]
-        speech_vector = []
+        speech_vector = response.objects[0].vector["speaker"]
         sc = self.client.collections.get(speaker_collection)
         speaker_response = sc.query.near_vector(
             near_vector=speech_vector,
             return_properties=["name"],
+            limit=1,
         )
 
-        print(speaker_response)
-        # TODO: finish
+        print("speaker response", speaker_response)
+        if len(speaker_response.objects) == 0:
+            return  "inspreker"
+
+        name = speaker_response.objects[0].properties["name"]
+        return  name
