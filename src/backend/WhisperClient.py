@@ -69,7 +69,9 @@ class Torch_Transcriber(Transcriber):
 
         print(f"Transcribing {input_file}.")
         try:
-            transcription = self.model.transcribe(input_file, language="nl")
+            transcription = self.model.transcribe(
+                input_file, decode_options={"language": "nl"}
+            )
         except Exception as e:
             print("Error transcribing!", e)
             return WhisperReturnCodes.OTHER_ERROR
