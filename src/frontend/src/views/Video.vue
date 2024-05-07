@@ -91,10 +91,11 @@ async function getSpeakerName(speakerID) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code: route.params.videoID, speakerID: speakerID })
     };
-    // console.log(options)
     const nameResponse = await fetch(`http://127.0.0.1:3012/api/weaviate/getSpeakerName`, options)
     const data = await nameResponse.json();
-    console.log(data)
+    // TODO: Check for errors
+
+    return data.name
 }
 
 function getRandomSuffix() {
@@ -105,26 +106,30 @@ function getRandomSuffix() {
     return result;
 }
 
-function createSpeakerNameMapping() {
+async function createSpeakerNameMapping() {
     if (!speakers.value) return
+    let promises = [];
     speakers.value.forEach(async speaker => {
         if (speaker.speaker != "") {
-            if (speaker.speaker in speakerNameMapping.value) {
-                speaker.name = speakerNameMapping.value[speaker.speaker]
-            } else {
-                let name = await getSpeakerName(speaker.speaker)
-                if (name == "inspreker") {
-                    name = "inspreker" + getRandomSuffix()
-                }
-                name = "henk" // tmp
-
-                speaker.name = name
-
-                speakerNameMapping.value[speaker.speaker] = name
+            if (!(speaker.speaker in speakerNameMapping.value)) {
+                speakerNameMapping.value[speaker.speaker] = ""
+                let namePromise = getSpeakerName(speaker.speaker);
+                promises.push(namePromise.then(name => {
+                    console.log("Name is ", name)
+                    if (name === "inspreker") {
+                        name = "inspreker" + getRandomSuffix()
+                    }
+                    speaker.name = name
+                    speakerNameMapping.value[speaker.speaker] = name
+                }));
             }
         }
     });
-    console.log(speakers.value)
+    // Wait for requests to finish and then name all unnnamed speakers.
+    await Promise.all(promises)
+    speakers.value.forEach(speaker => {
+        speaker.name = speakerNameMapping.value[speaker.speaker]
+    })
 }
 
 function createAgendaMapping() {
