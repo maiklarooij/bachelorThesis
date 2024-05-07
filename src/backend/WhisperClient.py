@@ -48,7 +48,9 @@ class MLX_Transcriber(Transcriber):
         print(f"Transcribing {input_file}.")
         try:
             transcription = whisperMLX.transcribe(
-                input_file, path_or_hf_repo=self.model
+                input_file,
+                path_or_hf_repo=self.model,
+                language= "nl",
             )
         except huggingface_hub.utils.RepositoryNotFoundError as e:
             return WhisperReturnCodes.INVALID_MODEL
