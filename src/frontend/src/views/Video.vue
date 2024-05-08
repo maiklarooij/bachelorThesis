@@ -115,7 +115,6 @@ async function createSpeakerNameMapping() {
                 speakerNameMapping.value[speaker.speaker] = ""
                 let namePromise = getSpeakerName(speaker.speaker);
                 promises.push(namePromise.then(name => {
-                    console.log("Name is ", name)
                     if (name === "inspreker") {
                         name = "inspreker" + getRandomSuffix()
                     }
