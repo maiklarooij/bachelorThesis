@@ -15,6 +15,8 @@ const props = defineProps({
     year: String,
     speaker: String,
     video: String,
+    minTime: Number,
+    maxTime: Number,
 })
 
 watch(searchResults, (searchResults, _) => {
@@ -57,6 +59,8 @@ async function vectorBM25() {
             year: years,
             speaker: speakers,
             video: videos,
+            minTime: props.minTime,
+            maxTime: props.maxTime,
         })
     };
     console.log(weaviateOptions)
@@ -112,6 +116,8 @@ async function vectorSearch() {
             year: years,
             speaker: speakers,
             video: videos,
+            minTime: minTime,
+            maxTime: maxTime,
         })
     };
     const weaviateResponse = await fetch(`http://127.0.0.1:3012/api/weaviate/searchVector`, weaviateOptions)
@@ -168,6 +174,8 @@ async function hybridSearch() {
             year: years,
             speaker: speakers,
             video: videos,
+            minTime: minTime,
+            maxTime: maxTime,
         })
     };
     const weaviateResponse = await fetch(`http://127.0.0.1:3012/api/weaviate/searchHybrid`, weaviateOptions)
@@ -177,7 +185,7 @@ async function hybridSearch() {
 }
 
 async function clickSearch() {
-    console.log(`Clicked search with method ${props.method} and limit ${props.limit}. Current search parameters: gemeente: ${props.gemeente}, type: ${props.type}, year: ${props.year}, speaker: ${props.speaker}, video: ${props.video}`)
+    console.log(`Clicked search with method ${props.method} and limit ${props.limit}. Current search parameters: gemeente: ${props.gemeente}, type: ${props.type}, year: ${props.year}, speaker: ${props.speaker}, video: ${props.video}, min/max time: ${props.minTime}`)
     if (searchQuery.value == "") {
         return
     }
@@ -186,7 +194,7 @@ async function clickSearch() {
     } else if (props.method == "bm25") {
         await vectorBM25()
     } else if (props.method == "hybrid") {
-        await hybridSearch() // TODO idk of dit helemaal goed werktx
+        await hybridSearch()
     }
 
     emit("newQuery", searchQuery.value)

@@ -1,9 +1,9 @@
 <script setup>
 import { ref, watch } from 'vue';
 
-const emit = defineEmits(['newGemeenteToSearch', 'newMeetingTypeToSearch', 'newMeetingYearToSearch', 'newSpeakerToSearch', 'newSearchMethod', 'newSearchLimit', 'newSearchalpha'])
+const emit = defineEmits(['newGemeenteToSearch', 'newMeetingTypeToSearch', 'newMeetingYearToSearch', 'newSpeakerToSearch', 'newSearchMethod', 'newSearchLimit', 'newSearchalpha', 'newAgendaToSearch'])
 
-defineProps({
+const props = defineProps({
     gemeentes: Array,
     searchGemeenteActive: Boolean,
     searchTypeActive: Boolean,
@@ -12,7 +12,7 @@ defineProps({
     availableAgenda: Array,
 })
 
-const searchMethod = ref("vector");
+const searchMethod = ref("hybrid");
 const searchLimit = ref(10);
 const searchalpha = ref(0.5);
 const searchGemeente = ref("");
@@ -22,6 +22,7 @@ const availableYears = ref([]);
 const searchYear     = ref("");
 const availableSpeakers = ref([]);
 const searchSpeaker     = ref("");
+const searchAgenda     = ref("");
 
 
 watch(searchMethod, (searchMethod, _) => {
@@ -54,22 +55,32 @@ watch(searchType, (searchType, _) => {
 })
 
 watch(searchYear, (searchYear, _) => {
-    // console.log(searchYear)
-    // fetch(`http://127.0.0.1:3012/api/gemeenteYears?gemeente=${searchGemeente.value}&meetingType=${searchType}`)
-    //     .then(response => response.json())
-    //     .then(data => availableYears.value = data.years)
-
     emit("newMeetingYearToSearch", searchYear)
 })
 
 watch(searchSpeaker, (searchSpeaker, _) => {
-    // console.log(searchSpeaker)
-    // fetch(`http://127.0.0.1:3012/api/gemeenteYears?gemeente=${searchGemeente.value}&meetingType=${searchType}`)
-    //     .then(response => response.json())
-    //     .then(data => availableYears.value = data.years)
-
     emit("newSpeakerToSearch", searchSpeaker)
 })
+
+watch(searchAgenda, (searchAgenda, _) => {
+    if (!searchAgenda) return
+    console.log(searchAgenda)
+    const startTime = props.availableAgenda.find(obj => obj.agendaPoint === searchAgenda).start
+    const endTime = props.availableAgenda.find(obj => obj.agendaPoint === searchAgenda).start + props.availableAgenda.find(obj => obj.agendaPoint === searchAgenda).time
+    console.log(startTime, typeof startTime)
+    emit("newAgendaToSearch", startTime, endTime)
+})
+
+// function resetSettings() {
+//     searchMethod.value = "hybrid"
+//     searchLimit.value = 10
+//     searchalpha.value = 0.5
+//     searchGemeente.value = ""
+//     searchType.value = ""
+//     searchYear.value = ""
+//     searchSpeaker.value = ""
+//     searchAgenda.value = ""
+// }
 
 </script>
 
@@ -121,12 +132,14 @@ watch(searchSpeaker, (searchSpeaker, _) => {
             </option>
         </select>
 
-        <!-- speaker picker -->
-        <select v-if="availableAgenda" v-model="searchSpeaker" class="p-2 text-center max-w-28">
+        <!-- agenda picker -->
+        <select v-if="availableAgenda" v-model="searchAgenda" class="p-2 text-center max-w-28">
             <option disabled value="">Agenda</option>
             <option v-for="a in availableAgenda">
                 {{ a.agendaPoint }}
             </option>
         </select>
+
+        <!-- <button @click="resetSettings" class="px-2 py-1">Reset</button> -->
     </div>
 </template>

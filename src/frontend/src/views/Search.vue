@@ -57,7 +57,6 @@ function updateSearchAlpha(emittedValue) {
 }
 
 function HandleNewQueryEmit(query) {
-    console.log("New query is", query)
     searchQuery.value = query
 }
 
