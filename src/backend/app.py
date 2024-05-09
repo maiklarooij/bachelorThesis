@@ -69,12 +69,12 @@ print("Loading Weaviate client")
 weaviate_client = Weaviate()
 
 embed_client = None
-# print("Loading embedding client")
-# embed_client = MpnetEmbedder()
+print("Loading embedding client")
+embed_client = MpnetEmbedder()
 
 llm_client = None
-# print("Loading llm client")
-# llm_client = MlxLlama(model_name="mlx-community/dolphin-2.9-llama3-8b-1m-4bit")
+print("Loading llm client")
+llm_client = MlxLlama(model_name="mlx-community/Meta-Llama-3-8B-Instruct-8bit")
 
 t5_client = None
 # print("Loading T5 client")
@@ -231,6 +231,8 @@ async def search_h(body: WeaviateSearchHybridBody):
         "years": body.year,
         "speakers": body.speaker,
         "videos": body.video,
+        "min_time": body.minTime,
+        "max_time": body.maxTime,
     }
     if body.query_properties is not None:
         kwargs["query_properties"] = body.query_properties
@@ -256,6 +258,8 @@ async def search_b(body: WeaviateSearchBM25Body):
         "years": body.year,
         "speakers": body.speaker,
         "videos": body.video,
+        "min_time": body.minTime,
+        "max_time": body.maxTime,
     }
     if body.query_properties is not None:
         kwargs["query_properties"] = body.query_properties
@@ -281,6 +285,8 @@ async def search_v(body: WeaviateSearchVectorBody):
         body.year,
         body.speaker,
         body.video,
+        body.minTime,
+        body.maxTime,
     )
     # Verify objects & get return code
 
@@ -369,26 +375,35 @@ async def chat(body: ChatBody):
     if not embed_client:
         raise HTTPException(status_code=503, detail="Embed client not active")
 
-    # TODO: check if works?
-    r = weaviate_client.search_hybrid(
+    if body.language != "nl" and body.language != "en":
+        raise HTTPException(status_code=500, detail="Language should be 'nl' or 'en'")
+
+    r = weaviate_client.search_bm25(
         "TranscriptsV2",
         body.question,
-        embed_client.embed(body.question),
         1,
         "text",
-        0.4,
         [body.government],
         [body.meeting_type],
         [body.year],
-        [], # Speakers, todo later
+        [],  # Speakers, todo later
         [body.video],
+        None,
+        None,
     )
-    context = r[0]["properties"]["text"]
-    # TODO use get context weaviate serch function to get surrounding context from the number one found by hyrbis search
 
+    if len(r) == 0:
+        print("No results found.")
+        return {"status": "OK", "response": "Ik kan hier helaas geen informatie over vinden."}
+
+    context = r[0]["properties"]["text"]
+
+    # Last item of history is the question, this adds the needed context to the question.
     history = body.history
     history[-1]["content"] = f'{history[-1]["content"]}\n\nContext: {context}'
 
+    # TODO: translate to english and back after response
+    print("Running llama")
     resp = llm_client.run(history)
 
     return { "status": "OK", "response": resp }
@@ -421,7 +436,7 @@ async def translate_e_d(body: TranslateBody):
 BASE_PATHS = [
     "/Volumes/Samsung_T5/data/",
     # "/Volumes/Drive/data/",
-    # "/Users/personal/Desktop/scriptie/notebooks/data/",
+    "/Users/personal/Desktop/scriptie/notebooks/final/",
 ]
 @app.get("/api/gemeentes")
 async def get_gemeentes():

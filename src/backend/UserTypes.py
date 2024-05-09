@@ -1,4 +1,4 @@
-from typing import List, Any, Dict, Optional
+from typing import List, Any, Dict, Optional, Union
 from pydantic import BaseModel
 
 class WhisperReturnCodes:
@@ -73,6 +73,8 @@ class WeaviateSearchHybridBody(BaseModel):
     year: List[str]
     speaker: List[str]
     video: List[str]
+    minTime: Union[float, None]
+    maxTime: Union[float, None]
     query_properties: Optional[List[str]] = None
 
 class WeaviateSearchBM25Body(BaseModel):
@@ -85,6 +87,8 @@ class WeaviateSearchBM25Body(BaseModel):
     year: List[str]
     speaker: List[str]
     video: List[str]
+    minTime: Union[float, None]
+    maxTime: Union[float, None]
     query_properties: Optional[List[str]] = None
 
 class WeaviateSearchVectorBody(BaseModel):
@@ -97,6 +101,9 @@ class WeaviateSearchVectorBody(BaseModel):
     year: List[str]
     speaker: List[str]
     video: List[str]
+    minTime: Union[float, None]
+    maxTime: Union[float, None]
+
 
 class WeaviateGetContext(BaseModel):
     collection: str
@@ -129,6 +136,7 @@ class ChatBody(BaseModel):
     year: str
     video: str
     question: str
+    language: str
 
 class TranslateBody(BaseModel):
     text: str
