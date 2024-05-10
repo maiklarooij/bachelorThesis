@@ -73,8 +73,8 @@ print("Loading embedding client")
 embed_client = MpnetEmbedder()
 
 llm_client = None
-print("Loading llm client")
-llm_client = MlxLlama(model_name="mlx-community/Meta-Llama-3-8B-Instruct-8bit")
+# print("Loading llm client")
+# llm_client = MlxLlama(model_name="mlx-community/Meta-Llama-3-8B-Instruct-8bit")
 
 t5_client = None
 # print("Loading T5 client")

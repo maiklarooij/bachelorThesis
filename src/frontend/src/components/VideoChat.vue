@@ -19,16 +19,26 @@ function scrollToBottom() {
     }
 }
 
+function getMeetingType() {
+    if (route.params.gemeenteType === "vergaderingen") return "vergadering"
+    return route.params.gemeenteType
+}
+
 async function sendChat(newQuestion) {
     const options = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             history: chatHistory.value,
+            government: route.params.gemeenteName,
+            meeting_type: getMeetingType(),
+            year: route.params.gemeenteYear,
             video: route.params.videoID,
             question: newQuestion,
+            language: "nl", // nl or en
         })
     };
+    console.log(options)
     const resp = await fetch(`http://127.0.0.1:3012/api/chat`, options)
     const data = await resp.json();
     console.log(data)
@@ -58,6 +68,9 @@ function newQuestion(question) {
                 </SpeechBox>
             </div>
         </div>
-        <ChatTypeBox @askQuestion="newQuestion" class="my-6"></ChatTypeBox>
+        <div class="flex justify-center">
+            <ChatTypeBox @askQuestion="newQuestion" class="my-6"></ChatTypeBox>
+
+        </div>
     </div>
 </template>
