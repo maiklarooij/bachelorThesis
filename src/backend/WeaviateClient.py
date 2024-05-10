@@ -40,7 +40,7 @@ def get_datatype(type_string):
     else:
         raise Exception("Incorrect data type")
 
-def get_filters(governments, meeting_types, years, speakers, videos):
+def get_filters(governments, meeting_types, years, speakers, videos, min_time, max_time):
     filters = None
     # Removes empty string elements.
     governments = list(filter(lambda x: x != "", governments))
@@ -73,6 +73,16 @@ def get_filters(governments, meeting_types, years, speakers, videos):
         filters = Filter.by_property("code").contains_any(videos)
     elif len(videos) > 0:
         filters = filters & Filter.by_property("code").contains_any(videos)
+
+    if filters is None and min_time is not None:
+        filters = Filter.by_property("start").greater_than(min_time)
+    elif min_time is not None:
+        filters = filters & Filter.by_property("start").greater_than(min_time)
+
+    if filters is None and max_time is not None:
+        filters = Filter.by_property("end").less_than(max_time)
+    elif max_time is not None:
+        filters = filters & Filter.by_property("end").less_than(max_time)
 
     return filters
 
@@ -180,6 +190,8 @@ class Weaviate:
         years,
         speakers,
         videos,
+        min_time,
+        max_time,
         query_properties=["text^2"],
     ):
         c = self.client.collections.get(collection)
@@ -187,7 +199,9 @@ class Weaviate:
             query=query,
             limit=limit,
             # target_vector=target_vec,
-            filters=get_filters(governments, meeting_types, years, speakers, videos),
+            filters=get_filters(
+                governments, meeting_types, years, speakers, videos, min_time, max_time
+            ),
             query_properties=query_properties,
             return_metadata=MetadataQuery(score=True),
         )
@@ -205,8 +219,6 @@ class Weaviate:
             for o in response.objects
         ]
 
-        print(objs)
-
         return objs
 
     def search_vector(
@@ -220,6 +232,8 @@ class Weaviate:
         years,
         speakers,
         videos,
+        min_time,
+        max_time,
     ):
         c = self.client.collections.get(collection)
 
@@ -228,7 +242,9 @@ class Weaviate:
             near_vector=vector,
             limit=limit,
             target_vector=target_vec,
-            filters=get_filters(governments, meeting_types, years, speakers, videos),
+            filters=get_filters(
+                governments, meeting_types, years, speakers, videos, min_time, max_time
+            ),
             return_metadata=MetadataQuery(distance=True),
         )
         # TODO: Verify search was succeful
@@ -261,6 +277,8 @@ class Weaviate:
         years,
         speakers,
         videos,
+        min_time,
+        max_time,
         query_properties=["text^2"],
     ):
         c = self.client.collections.get(collection)
@@ -272,7 +290,9 @@ class Weaviate:
             limit=limit,
             target_vector=target_vec,
             vector=vector,
-            filters=get_filters(governments, meeting_types, years, speakers, videos),
+            filters=get_filters(
+                governments, meeting_types, years, speakers, videos, min_time, max_time
+            ),
             return_metadata=MetadataQuery(score=True, explain_score=True),
         )
 
