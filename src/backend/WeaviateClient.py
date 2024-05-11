@@ -349,18 +349,20 @@ class Weaviate:
             include_vector=True,
         )
         if len(response.objects) == 0:
-            print("NOTHING FOUND!")
-            # TODO: return error
+            print(speakerID, "not found in transcripts weaviate.")
+            return "inspreker"
 
         speech_vector = response.objects[0].vector["speaker"]
         sc = self.client.collections.get(speaker_collection)
         speaker_response = sc.query.near_vector(
             near_vector=speech_vector,
             return_properties=["name"],
+            distance=0.5,
             limit=1,
+            return_metadata=MetadataQuery(distance=True),
         )
 
-        print("speaker response", speaker_response)
+        # print("speaker response", speaker_response)
         if len(speaker_response.objects) == 0:
             return  "inspreker"
 
