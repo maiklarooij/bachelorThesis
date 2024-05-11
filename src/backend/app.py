@@ -1,12 +1,12 @@
 import json
 import os
+import time
 import torch
-
-import warnings
+import zipfile
 
 from dotenv import load_dotenv
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
@@ -44,7 +44,6 @@ from EmbedClient import SFRMistralEmbedder, MpnetEmbedder
 from LlmClient import MlxLlama
 from T5Client import T5
 
-warnings.filterwarnings("ignore")
 
 load_dotenv()
 
@@ -624,3 +623,32 @@ async def get_video_transcript(gemeente: str, meetingType: str, year: str, video
     transcript = data.get("text")
 
     return {"status": "OK", "transcript": transcript}
+
+
+@app.get("/api/downloadArchive")
+async def download(gemeente: str, meetingType: str, year: str, video: str):
+    code = video.replace(".mp4", "")
+    print(video)
+    base = None
+    for path in BASE_PATHS:
+        if os.path.isfile(f"{path}/{gemeente}/{meetingType}/{year}/videos/{video}"):
+            base = f"{path}/{gemeente}/{meetingType}/{year}"
+
+    tmp_path = f"{code}_archive_{int(time.time())}.zip"
+    dior_path = (f"{base}/diorizations/{code}.wav.rttm", f"{code}_diarisation.rttm")
+    trans_path = (f"{base}/transcripts/{code}.mp4.json", f"{code}_transcript.json")
+    final_obj_path = (f"{base}/finalObjects/{code}.mp4.json", f"{code}_completeObject.json")
+
+    paths = [dior_path, trans_path, final_obj_path]
+    with zipfile.ZipFile(tmp_path, "w") as zipf:
+        for p, name in paths:
+            if os.path.isfile(p):
+                zipf.write(p, name)
+
+    response = FileResponse(
+        tmp_path, filename=f"{code}.zip", media_type="application/zip"
+    )
+
+    os.remove(tmp_path)
+
+    return response

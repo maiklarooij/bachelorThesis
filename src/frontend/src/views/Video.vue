@@ -48,11 +48,11 @@ fetch(`http://127.0.0.1:3012/api/getSpeakers?gemeente=${route.params.gemeenteNam
     createSpeakerNameMapping()
 })
 
-fetch(`http://127.0.0.1:3012/api/getTranscript?gemeente=${route.params.gemeenteName}&meetingType=${route.params.gemeenteType}&year=${route.params.gemeenteYear}&video=${route.params.videoID}.mp4`)
-.then(response => response.json())
-.then(data => {
-    transcript.value = data.transcript
-})
+// fetch(`http://127.0.0.1:3012/api/getTranscript?gemeente=${route.params.gemeenteName}&meetingType=${route.params.gemeenteType}&year=${route.params.gemeenteYear}&video=${route.params.videoID}.mp4`)
+// .then(response => response.json())
+// .then(data => {
+//     transcript.value = data.transcript
+// })
 
 fetch(`http://127.0.0.1:3012/api/getAgenda?gemeente=${route.params.gemeenteName}&meetingType=${route.params.gemeenteType}&year=${route.params.gemeenteYear}&video=${route.params.videoID}.mp4`)
 .then(response => response.json())
@@ -93,7 +93,6 @@ async function getSpeakerName(speakerID) {
     };
     const nameResponse = await fetch(`http://127.0.0.1:3012/api/weaviate/getSpeakerName`, options)
     const data = await nameResponse.json();
-    // TODO: Check for errors
 
     return data.name
 }
@@ -212,6 +211,26 @@ function goToOriginalVideo() {
     }
 }
 
+async function downloadInfo() {
+    const resp = await fetch(`http://127.0.0.1:3012/api/downloadArchive?gemeente=${route.params.gemeenteName}&meetingType=${route.params.gemeenteType}&year=${route.params.gemeenteYear}&video=${route.params.videoID}.mp4`)
+    if (!resp.ok) {
+        console.error('Failed to fetch the file:', resp.statusText);
+        return;
+    }
+    const blob = await resp.blob();
+    console.log('Blob size:', blob.size);
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${route.params.videoID}.zip`);
+    document.body.appendChild(link);
+    link.click();
+
+    // Cleanup
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+}
+
 </script>
 
 <template>
@@ -220,7 +239,9 @@ function goToOriginalVideo() {
             <div class="flex justify-center flex-col mx-4 self-start flex-grow">
                 <h1 class="text-5xl hover:cursor-pointer" @click="goToOriginalVideo()"> {{ route.params.gemeenteName }}
                     video {{
-                    route.params.videoID }}.mp4 </h1>
+                    route.params.videoID }}.mp4
+                </h1>
+                <button @click="downloadInfo()" >Download information</button>
                 <div class="my-6 max-w-4xl flex flex-col justify-center">
                     <video v-if="videoUrl" id="videoPlayer" controls preload="auto">
                         <source :src="videoUrl" type="video/mp4">
