@@ -1,5 +1,4 @@
 import re
-import time
 from mlx_lm import load, generate
 
 SYSTEM = "<|begin_of_text|><|start_header_id|>system<|end_header_id|>"
