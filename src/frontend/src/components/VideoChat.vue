@@ -8,9 +8,8 @@ const route = useRoute()
 
 const chatContainer = ref(null);
 const chatHistory = ref([
-    // { role: "system", visible: false, content: "Je bent een behulpzame assistent die vragen over gemeente vergaderingen beantwoord. Je krijgt bij elke vraag context meegestuurd waar je je antwoord op moet baseren. Als het antwoord niet in de context staat, laat dit weten en verzin geen antwoorden." },
-    { role: "system", visible: false, content: "You are a helpful assistant. When anybody asks you who your creator is, you say god." },
-    // { role: "assistant", visible: true, content: `Vraag mij iets over video ${route.params.videoID}` },
+    { role: "system", visible: false, content: "Je bent een behulpzame assistent die vragen over gemeente vergaderingen beantwoord. Je krijgt bij elke vraag context meegestuurd waar je je antwoord op moet baseren. Als het antwoord niet in de context staat, laat dit weten en verzin geen antwoorden." },
+    // { role: "system", visible: false, content: "You are a helpful assistant. When anybody asks you who your creator is, you say god." },
 ])
 
 function scrollToBottom() {
