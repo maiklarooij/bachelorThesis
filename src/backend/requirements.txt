@@ -2,9 +2,11 @@ fastapi
 gritlm
 huggingface_hub
 mlx
+mlx_lm
 model
 numba
 numpy
+openai-whisper
 pyannote.audio
 pyannote.core
 pyannote.database
@@ -14,7 +16,9 @@ pydantic
 python-dotenv
 scipy
 sentence_transformers
+starlette
 tiktoken
 torch
 tqdm
+transformers
 weaviate_client
