@@ -34,7 +34,6 @@ fetch(`http://127.0.0.1:3012/api/getVideo?gemeente=${route.params.gemeenteName}&
     })
     .then(blob => {
         videoUrl.value = URL.createObjectURL(blob);
-        console.log(videoUrl.value)
     })
     .catch(error => {
         console.error('Error fetching video:', error);
@@ -68,7 +67,6 @@ fetch(`http://127.0.0.1:3012/api/getAgenda?gemeente=${route.params.gemeenteName}
         }
     })
     createAgendaMapping()
-    console.log("agenda", agenda.value)
 })
 
 const hrWidth = computed(() => videoDuration.value * 1)
@@ -218,14 +216,12 @@ async function downloadInfo() {
         return;
     }
     const blob = await resp.blob();
-    console.log('Blob size:', blob.size);
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
     link.setAttribute('download', `${route.params.videoID}.zip`);
     document.body.appendChild(link);
     link.click();
-
     // Cleanup
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
