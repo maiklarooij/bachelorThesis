@@ -1,0 +1,202 @@
+\documentclass[twoside]{uva-inf-bachelor-thesis}
+%\usepackage[dutch]{babel}
+
+% Filling your thesis with only lorem ipsum is not advised.
+\usepackage{lipsum}
+
+% Citations
+\usepackage[style=numeric]{biblatex}
+\addbibresource{references.bib}
+
+% Title Page
+\title{Improving government transparency with a video search engine}
+\author{Pepijn van Wijk}
+\supervisors{Dr. Maarten Marx}
+\signedby{Signees}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\lipsum[2]
+\end{abstract}
+
+\tableofcontents
+
+\chapter{Introduction}
+One of the foundations of a strong democracy is transparency. Citizens must have the opportunity to be informed about- and control the inner workings and decision making process of their (local) governments. To help improve government transparency, Dutch lawmakers introduced the 'Wet Open Overheid' (Woo) \footnote{https://wetten.overheid.nl/BWBR0045754} in 2022. 
+This law is applicable to all governmental bodies, from the house of representatives to local municipalities to the tax authority. The three most important terms the Woo brings are: \textit{active publication}, stating government bodies should actively publish some types of information. \textit{Publication on request} states that information should be made public on request. Lastly, the \textit{information management obligation} states that all this information should be easily accessible. 
+
+Various online tools such as the official Woo-index \footnote{https://organisaties.overheid.nl/woo} and Woogle \footnote{https://woogle.wooverheid.nl} offer the ability to search through a wide range of uploaded documents and information. 
+Though millions of documents are already publishes and searchable, the searchability of one important type of information is lacking; the meetings. Decisions, from large to small, are made during long meetings that are livestreamed and archived. These video archives, often three to four hours, not only require vast amounts of storage, they are also difficult to comb through. 
+
+This paper provides a solution to this issue by answering the question \textit{how can AI be utilized in order to increase information retrievability of large video archives, in particular of democratically elected councils}? In order to land at a satisfying answer to this research question, some related questions need to be answered first. 
+First, the video archives need to be obtained. This means that the first part of this research will be finding an answer to the question \textit{what are the different archive formats local authorities host in order to comply with the Woo and how are these formats exploited to retrieve as much information as possible}?
+To extract as much relevant information from the video archives, the question \textit{what state-of-the-art audio analysis tools can be used to improve searchability of the meetings}? needs to be answered. During the aforementioned hour long meetings, many different subjects are discussed. By answering the question \textit{how accurately can such a video be segmented into the meaningfully different parts which are discussed}?, this fact can be used to provide a better overview of the video, as well as enhancing searchability. Finally, an answer to the question \textit{what state-of-the-art information retrieval techniques can be leveraged to develop an efficient video information retrieval system}? should be found, tying everything together.
+On top of these base questions, the last part of this research regards an integration of the search system with a large language model, answering the final sub question \textit{how well can the developed search system be integrated with a large language model, creating a helpful chat bot capable of answering questions and providing complementary information when needed}?
+
+\chapter{Theoretical background}
+
+\section{Natural Language Processing}
+Natural Language Processing (NLP) is the field in computer science primarily focusing on enabling computers to understand human language. Naturally, simply having knowledge of different words and their meaning does not suffice for achieving this goal. A true understanding of language can only be obtained by understanding grammatical rules, contextual details and potential informal vernacular differences in texts from different areas.
+
+Natural language processing is widely used in everyday life. Whenever you see a foreign article on the internet and use the translate feature to translate this text to English for example. Or, blabla bla bla...
+
+Natural language processing has its historical roots roughly halfway of the previous century. During this time, early experiments were performed trying to create computer chat bots and to automatically translate foreign languages. From the 1950's onwards, an approach that is now called 'symbolic NLP' was used. Symbolic NLP is similar to the way humans learn to understand languages: using a set of handcrafted rules, structures, patterns and decision trees, a framework for the understanding and generation of a language is created. The machine then follows this set of rules to determine the desired output \cite{Dale00}. One example of this symbolic NLP approach is the ELIZA computer program, dating back to 1964. ELIZA was developed by Joseph Weizenbaum at MIT. ELIZA analyzes input sentences by applying a set of generated decomposition rules and key word detection \cite{weizenbaum66} \cite{Jurafsky08}. A response is then generated by a rule set focused on mimicking Rogerian psychotherapy responses \cite{Yao23}. 
+
+
+\begin{figure}[h]
+    \begin{verbatim}
+    [User]:  Men are all alike.
+    [ELIZA]: IN WHAT WAY?
+    [User]:  They're always bugging us about something or other. 
+    [ELIZA]: CAN YOU THINK OF A SPECIFIC EXAMPLE?
+    [User]:  Well, my boyfriend made me come here.
+    [ELIZA]: YOUR BOYFRIEND MADE YOU COME HERE
+    [User]:  He says I'm depressed much of the time
+    [ELIZA]: I AM SORRY TO HEAR YOU ARE DEPRESSED
+    \end{verbatim}
+    \caption{A piece of conversation with ELIZA. \cite{weizenbaum66}}
+    \label{fig:eliza-conv}
+\end{figure}
+
+
+With the rapid advances of computational power, the lessening of the dominance Noam Chomsky's linguistics theories and the greater digitisation of written texts, the 80's brought in a natural language processing revolution. The old system of rule sets and decision trees was replaced by a new approach using statistics and machine learning. Instead of following a set of rules, statistical NLP focuses on the discovery of common patterns found within a given corpus of language \cite{Manning99}. The detection of these patterns is learned from gigantic bodies of text, called a corpus (plural: corpora). The popularization of the internet and various governments' efforts of digitisation greatly facilitated the collection of these corpora. 
+Perhaps the best example of an application of statistical NLP is the predecessor of all current state-of-the-art large language models, the n-gram language model. The n-gram language model works by predicting the occurrence of a word, based on the preceding $n-1$ words. The probability of a word $w_n$ occurring at the end of a sequence of words $w_{n-N+1 : n-1}$ is given by equation \ref{mle} \cite{brown92, Manning99}.
+\begin{equation} \label{mle}
+    P(w_{n} | w_{n-N+1 : n-1}) = \frac{C(w_{n-N+1 : n-1} w_{n})}{C(w_{n-N+1 : n-1})}
+\end{equation}
+Here, $N$ is the window of text and $C$ is the count of occurrences, as found in the corpus. 
+
+Naturally, large amounts of text need to be processed in order to form an accurate probabilistic model. Despite being first invented in 1948 by mathematician Claude E. Shannon \cite{shannon48}, the lack of computational power to process these large amounts of text prevented the implementation of the n-gram model until much later.
+
+
+For many years, the n-gram language model was the state-of-the-art algorithm in language processing. Despite this, it had a significant problem: the curse of dimensionality. The curse of dimensionality is the exponential growth of computational resources needed, when dimensionality of discrete variables increases. To illustrate this, let's say one wants to model the joint distribution of $10$ consecutive words in a language with a vocabulary V of size $100,000$. The amount of free parameters here would total $100,000^{10}-1 = 10^{50}-1$ \cite{bengio03}. 
+In 2003, Youshua Bengio et al. proposed a new method of predicting the next word given a sequence of preceding words, utilizing a multi-layer perceptron. Instead of raw strings, it makes use of dense vector representations of words, with semantically similar words embedded closer to each other than meaningfully different words. The continuous nature of these word embeddings inherently do not suffer from the dimensionality curse, since probabilities for (unseen) word sequences are based on the learned similarities between similar vectors. These word feature vectors and the parameters of the probability function are learned during the processing of the training corpus \cite{bengio03}. This innovation gave birth to the current most popular approach to natural language processing: neural NLP.
+
+% Iets over dat strings niet gebruikt worden, maar tokens en word- en sentence segmentation en tokenization enzo (?)
+\subsection{Word feature vectors}
+As briefly described in the previous section, current state-of-the-art NLP techniques works with embeddings of text. Despite being introduced in the early 2000's, this method did was not successful at corpora containing more than a few hundred millions unique words. In 2013, Google introduced Word2vec, alongside a paper proposing several techniques to train and obtain high quality word vectors, with a larger vocabulary and more accurate than before \cite{mikolov13}.
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/embeddings.png}
+    \caption{A two-dimensional (t-SNE) projection of word embeddings. Adapted from \cite{Manning99} and \cite{li16}}
+    \label{fig:embeddings}
+\end{figure}
+
+Interestingly, these vector representations contain an embedded meaning of the word. As stated before, semantically similar words are embedded close to each other in the vector space, a schematic, 2D representation of this phenomenon is illustrated in figure \ref{fig:embeddings}. Besides this locality, word vectors also contain relationships to other words, as learned from the context provided by the dataset. Perhaps the most famous example of this was found by one of the authors of Word2vec, several years earlier \cite{mikolov13_2}. This paper showed that when the vector representing 'Man' ($V('man')$) was deducted from $V('king')$, the result of which added to the vector $V('woman')$, results in a vector closest to the word 'Queen'. Later, the Word2vec paper presented several other examples showing the capabilities of 'word vector arithmetic', as seen in figure \ref{fig:vecarith}.
+\begin{figure}[h]
+    \centering
+    $$V('copper') - V('Cu') + V('zinc') \approx V('Zn')$$
+    $$V('Einstein') - V('scientist') + V('Mozart') \approx V('violinist')$$
+    $$V('Japan') - V('sushi') + V('Germany') \approx V('bratwurst')$$
+    \caption{Word vector arithmetic examples (read as 'zinc is to ... what copper is to Cu'). From \cite{mikolov13}}
+    \label{fig:vecarith}
+\end{figure}
+
+\subsection{Contextual feature vectors}
+
+Since the end of the 2010's, the implementation of Word2vec is not considered state-of-the-art anymore, being replaced by BERT \cite{devlin19} and GPT \cite{brown20}. The introduction, and consequent improvements of the transformer model shifted the focus in NLP to the utilization of these transformer models. Transformer models are like regular neural networks, but add several so called 'attention layers', allowing words to be processed in relation to all other words in the sequence, taking the specific context into account \cite{vaswani17, vondermosel22}.
+% TODO: meer uitleggen over contextual en trasnformers, dit is wat ik gebruik, MPnet paper aanhalen 
+
+\section{Information retrieval} \label{retrievalSection}
+According to current Director of the Stanford Artificial Intelligence Laboratory Christopher Manning, information retrieval can be defined as: 
+
+\say{Information Retrieval (IR) is finding material (usually documents) of an unstructured nature (usually text) that satisfies an information need from within large collections (usually stored on computers).}\cite{manning08IR}
+
+This definition steps away from the historic way of searching for data using database systems. In such systems, specific (unique) identifying information such as an order ID or document ID is needed to find data from an information system. Perhaps the most used manifestation that encapsulates this modern way of looking at IR is the Google search engine. The user enters a query, which attempts to communicate the user's information need. The search engine then performs various IR algorithms and ranks results based on their relevance to the entered query. Before the documents can be searched and ranked, they need to be pre-processed. In a process called indexing, a universal representation for the documents is derived that the system can efficiently index.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/irDiagram.png}
+    \caption{Information retrieval process. From \cite{goker2009information}}
+    \label{fig:ir}
+\end{figure}
+
+Over the years, many different approaches to IR came forward. These different strategies are roughly categorized in three separate models: the boolean model, the probabilistic model and the algebraic model. \cite{goker2009information}
+
+\subsection{Boolean information retrieval}
+The boolean model employs a relatively simple and straightforward strategy to information retrieval. A query consists of search terms and potentially the mathematical logical operators AND, OR and NOT. A search term either matches a document, or it does not. Thus, search results can not ranked be ranked like in other models.\cite{goker2009information, manning08IR} An example query that looks for political documents containing the term 'China', but not 'Japan' could look like the following, for example.
+\begin{verbatim}
+    political AND contains(China) AND NOT contains(Japan)
+\end{verbatim}
+Due to the fact that boolean queries lack the ability the rank returned results, this model is rarely used in practice. Other models that can rank results and offer the user more freedom to construct searches are favoured in modern systems.
+
+\subsection{Algebraic information retrieval}
+The algebraic model facilitates ranked retrieval, in which there is a collection of documents (the corpus), the user issues a query, and a ranked list of documents relevant to the query is returned.
+
+Assume the collection of documents has been pre-processed and indexed into many vectors as described in section \ref{}. Recall that semantically similar words and sentences lie closer in vector space than semantically dissimilar text. Given this fact, similar documents will naturally lie close to each other. Additionally, embedded queries that are relevant to specific documents, will be embedded relatively close to these relevant documents, meaning the measure of similarity between two vectors can function as a ranking score.
+
+The two most popular ranking functions are \textit{Euclidean distance} and \textit{cosine similarity}. Euclidean distance is a widely used metric in clustering problems, measuring the distance between two points in space. Equation \ref{eq:eucDist} gives the general formula for calculating the euclidean distance between two vectors $\textbf{V}$ and $\textbf{W}$ of dimension $n$. \cite{huang2008similarity}
+\begin{equation}\label{eq:eucDist}
+    D(\textbf{V}, \textbf{W}) = \sqrt{\sum_{i=1}^{n} (V_{i} - W_{i})^{2}}
+\end{equation}
+Cosine similarity, given in in equation \ref{}, is more popular in textual document information retrieval systems. It is not a metric of distance, but how similar two vector represented documents are. Similarity here, is seen as the angle between two vectors. Thus, unlike Euclidean distance, the difference in magnitude of two vectors has no influence on the metric. \cite{huang2008similarity, rahutomo2012semantic, manning08IR}
+\begin{equation}\label{eq:cossim}
+    S(\textbf{V}, \textbf{W}) = \frac{\textbf{V} \cdot \textbf{W}}{\lvert \textbf{V} \rvert \times \lvert \textbf{W} \rvert}
+\end{equation}
+
+Now, with a means of ranking documents based on a user's query, a search through the corpus is possible. However, the computational complexity to perform a search through all documents scales linearly with the documents. This means that large corpora will quickly become infeasible to query \cite{malkov2018efficient}.
+
+\subsection{Probabilistic information retrieval}
+Another model facilitating ranked retrieval is the probabilistic model. Central to this model lies the Probability Ranking Principle (PRP):
+
+\say{If a reference retrieval system’s response to each request is a ranking of the documents in the collection in order of decreasing probability of relevance to the user who submitted the request, where the prob- abilities are estimated as accurately as possible on the basis of what- ever data have been made available to the system for this purpose, the overall effectiveness of the system to its user will be the best that is obtainable on the basis of those data.} \cite{robertson1977probability}
+
+The main challenge of probabilistic information retrieval, is finding a ranking function that efficiently provides an accurate ranking of documents in a collection. 
+% TODO over Binary Independence Model
+
+\subsubsection{Okapi BM25}
+TODO
+
+
+\subsection{Vector databases}
+Vector databases are a relatively new technology that offer a storage and retrieval mechanism optimized for enormous amounts of data, often capable of querying hundreds of millions of documents with only milliseconds latency. 
+These remarkable results are achieved by the use of approximate nearest neighbor (ANN) algorithms, offering some accuracy for for a large speed gain \cite{han2023comprehensive}. 
+
+\subsubsection{Hierarchical Navigable Small World graphs}
+One of the most employed ANN algorithms is Hierarchical Navigable Small World graphs (HNSW) \cite{malkov2018efficient}. This proximity graph based algorithm is TODO
+
+\subsubsection{Hybrid search}
+Many vector databases allow for a combination between ANN powered vector similarity search and probabilistic searches. balblalba...
+
+
+\section{Video \& audio analysis}
+\subsection{Automatic Speech Recognition}
+\lipsum[2]
+
+\subsection{Speaker diarisation}
+\lipsum[2]
+
+\subsection{Pyannote}
+\lipsum[2]
+
+\subsection{Topic segmentation}
+\lipsum[2]
+
+\section{Retrieval Augmented Generation}
+\lipsum[2]
+
+
+\chapter{My work}
+\section{Crawler}
+\lipsum[10]
+
+\section{Video analysis}
+
+\section{Retrieval}
+
+\section{Architecture}
+% Vertellen dat een bert-like embedding model nodig is (verschillende getest, MPnet gekozen vertellen)
+\lipsum[10]
+
+\chapter{Experiments}
+
+\chapter{Discussion}
+% TODO vertellen dat de cross video speaker recognition aardig werkt (nog kwantificeren hoe goed pr3ecies), alleen bij de corona online meetings werkte het een stuk minder geod, vanwege de irreguliere mics en de hoge gain. Dit betekent dus dat de spreker herkenning gelinkt is aan de (type) mic
+
+\printbibliography
+
+\end{document}
