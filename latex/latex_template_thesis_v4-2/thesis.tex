@@ -164,20 +164,106 @@ Many vector databases allow for a combination between ANN powered vector similar
 
 
 \section{Video \& audio analysis}
+Before any of the aforementioned processing and retrieval can be performed, the video must be analysed and pre-processed. As deduced from the stated research questions, the main analysis and processing that is mandatory is transcription, with the use of automatic speech recognition tools, speaker detection, which is done with speaker diarisation models and topic segmentation with the use of large language models.
+
 \subsection{Automatic Speech Recognition}
-\lipsum[2]
+Automatic Speech Recognition (ASR), informally known as Speech To Text (STT), is the act of transforming spoken language into written text by a computer. ASR has been an old problem, going through many different stages and bringing many technical innovations over the years. 
+In the last two decades, the technical advances in ASR led to many consumer products used daily by tens of millions of people such as Amazon's Alexa and Google's home speakers.
+
+One of the very first systems systems capable of recognizing speech was developed in the early 1950's by a research group at Bell Labs. The system was capable of recognizing ten different words: the numbers one through nine - and zero ('oh'). By measuring the spectral peaks resulting from the resonance of the human vocal tract during vowel sounds, known as formant frequencies (figure \ref{fig:ff}), for each digit, the known words could be recognized with an accuracy of 97\% to 99\%. One limitation was that these accuracies could only be reached after preliminary analysis of the speaker's voice. \cite{davis1952automatic, Juang05}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/formantFrequencies.png}
+    \caption{Photographs of formant frequency presentations of the recognized digits. From \cite{davis1952automatic}}
+    \label{fig:ff}
+\end{figure}
+
+
+From the late seventies onwards, a focus on statistical approaches gained traction in favor of the previously used pattern recognition methods. With the use of recently formulated Markov chains and hidden Markov models, subsequent systems rapidly grew to a vocabulary of a thousand word, which was later broken by IBM's Tangora system, capable of recognizing over 20,000 words. \cite{Juang05}
+
+One particularly large milestone was the Sphinx-II system, developed in 1992 by, among others, Xuedong Huang at Carnegie Mellon University. Sphinx-II, using an advanced statistical approach, was the first system that had both a large vocabulary, and the ability to perform speaker-independent detection. The Sphinx-II also won DARPA's speech benchmark evaluation in 1992. ASR systems are mainly evaluated by their Word Error Rate (WER) (equation \ref{eq:wer}). Sphinx-II only suffered from a fairly low error rate of 5\% \cite{huang1993overview, huang2014historical}.
+
+\begin{equation} \label{eq:wer}
+    WER = \frac{S + D + I}{S + D + C}
+\end{equation}
+where:
+\begin{conditions}
+ S     &  the number of substitutions \\
+ D     &  the number of deletions \\   
+ I     &  the number of insertions \\
+ C     &  the number of correct words
+\end{conditions}
+
+Up until the late 2000's, the use of hidden Markov models and similar statistical methods still dominated in the ASR space. However, with the advent of deep neural networks (DNNs) and the aforementioned transformer architecture, the paradigm has shifted yet again, bringing light the the current state-of-the-art: OpenAI's Whisper ASR.
+
+\subsubsection{Whisper}
+In 2022, OpenAI released Whisper, capable of 'Robust Speech Recognition via Large-Scale Weak Supervision' \cite{radford2023robust}. Trained on 563,000 hours of labeled English speech, and 117,000 hours of labeled speech in 96 different languages, Whisper is the current state-of-the-art ASR system, with a (post normalisation) word error rate that is similar to a professional human transcriber, as seen in figure \ref{fig:whisperwer}.
+Whisper makes use of an encode-decoder Transformer, as described in \cite{vaswani17}. Input audio is first resampled and standardized, after which it is converted to a Mel Spectrogram, normalized and fed in to the network. A full view of the simplified architecture can be seen in figure \ref{fig:whisperarch}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/whisperwer.png}
+    \caption{Whisper WER compared to other companies and human professionals. From \cite{radford2023robust}}
+    \label{fig:whisperwer}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/whisperarch.png}
+    \caption{Simplified Whisper architecture. From \cite{radford2023robust}}
+    \label{fig:whisperarch}
+\end{figure}
 
 \subsection{Speaker diarisation}
-\lipsum[2]
+Speaker diarisation (SD) is the process of partitioning input audio containing multiple speakers, in to separate segments containing single speakers. It aims to solve the question 'Who spoke when?' \cite{sahidullah2019speed}. Speaker diarisation is a relatively new problem. In film and news studios the central question is not necessarily a mystery; different speakers have different microphones, whose data is known and separate at the time of processing and editing. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/speakerdiaroutput2.png}
+    \caption{Desired speaker diarisation result. From \cite{bredin2023pyannote}}
+    \label{fig:sdo}
+\end{figure}
+
+Central to speaker diarisation is voice profile feature extraction. When a reliable and accurate method of embedding voice profiles is achieved, these voice profile vectors can be compared using similarity measures such as cosine similarity or euclidean distance to find different speakers and when they speak. Different systems utilize different methods of obtaining feature vectors. Most of these feature extractors use various representations of sound waves, with additional features derived from pitch information and audio metadata, mostly from the standardised MPEG-7 audio standard \cite{kotti2008speaker, lu2002speaker}. Some of the most common features have a similar accuracy, Mel-frequency cepstral coefficients
+(MFCCs) \cite{gook04} and Line spectral pairs (LSPs) \cite{lu2002speaker}. 
 
 \subsection{Pyannote}
-\lipsum[2]
+ Pyannote.audio (pyannote) is the current state-of-the-art speaker diarisation mode. It is not only a speaker diarisation model, but it also offers a range of speaker diarization sub-modules. These submodules include voice activity detection, overlapped detection speech, speaker change detection, and more. \cite{bredin2020pyannote, bredin2023pyannote}
+
+In most competitions, speaker diarisation accuracy is graded by four criteria: speaker confusion rate (CONF), which is the duration of speaking where the speaker is mislabeled, false alarm rate, which is the duration of non-speech incorrectly classified as speech, missed detection, which is the duration of speech that is incorrectly classified as non-speech and Diarisation Error Rate (DER), which is the sum of these three. As can be seen from figure \ref{fig:pyanres}, pyannote scores at the top of most benchmarks. Top benchmarks are greatly improved by their preview baseline, while DERs on benchmarks where pyannote does not score at the top are fairly close, indicating a great overall performance. \cite{bredin2023pyannote}
+
+
+The pyannote system uses the following distinct steps on five seconds sliding windows of audio \cite{bredin2023pyannote}: 
+\begin{enumerate}
+    \item Local speaker segmentation, where these windows are analysed for different speakers and when these different speakers start- and stop speaking.
+    \item Local speaker embedding, where the voice profiles of the different speakers in the sliding windows get embedded.
+    \item Global agglomerative clustering, where local speakers are grouped into global clusters. 
+\end{enumerate}
+
+Pyannote diarisation outputs are formatted according to the Rich Transcription Time Marked (RTTM) file format, described in \cite{ryant2018first}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.99\textwidth]{images/pyanresults2.png}
+    \caption{Performance of the (default, optimized, and fine-tuned) pipelines on 11 different benchmarks. The grey background marks the best results for each dataset as well as those less than 5\% worse relatively. From \cite{bredin2023pyannote}}
+    \label{fig:pyanres}
+\end{figure}
 
 \subsection{Topic segmentation}
-\lipsum[2]
+\lipsum[4]
 
 \section{Retrieval Augmented Generation}
-\lipsum[2]
+Large Language Models (LLMs) store vast amounts of factual information within their parameters. For certain knowledge intensive queries or queries that require proprietary information not included in the training data, an LLM's knowledge recalling abilities are not enough. These situations require external information provided in the prompt that the LLM can use to give a complete and accurate answer \cite{NEURIPS2020_6b493230}. Retrieval Augmented Generation (RAG) is the process of enhancing the LLM's question answering capabilities by finding relevant context and documents and providing these to the LLM in the prompt. The LLM will then use the provided information to answer the user's question more accurate and with less hallucinations.
+
+The retrieval of the relevant context is mostly done by the use of a dense vector index or any other retrieval method described in section \ref{retrievalSection}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/rag.png}
+    \caption{Retrieval Augmented Generation pipeline}
+    \label{fig:pyanres}
+\end{figure}
 
 
 \chapter{My work}
