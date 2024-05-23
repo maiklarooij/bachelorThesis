@@ -19,6 +19,8 @@ const props = defineProps({
     maxTime: Number,
 })
 
+console.log("mintime:", props.minTime, "maxtime:", props.maxTime )
+
 watch(searchResults, (searchResults, _) => {
     emit("newResults", searchResults)
 })
@@ -116,8 +118,8 @@ async function vectorSearch() {
             year: years,
             speaker: speakers,
             video: videos,
-            minTime: minTime,
-            maxTime: maxTime,
+            minTime: props.minTime,
+            maxTime: props.maxTime,
         })
     };
     const weaviateResponse = await fetch(`http://127.0.0.1:3012/api/weaviate/searchVector`, weaviateOptions)
@@ -174,8 +176,8 @@ async function hybridSearch() {
             year: years,
             speaker: speakers,
             video: videos,
-            minTime: minTime,
-            maxTime: maxTime,
+            minTime: props.minTime,
+            maxTime: props.maxTime,
         })
     };
     const weaviateResponse = await fetch(`http://127.0.0.1:3012/api/weaviate/searchHybrid`, weaviateOptions)

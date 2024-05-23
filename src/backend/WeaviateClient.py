@@ -74,14 +74,14 @@ def get_filters(governments, meeting_types, years, speakers, videos, min_time, m
     elif len(videos) > 0:
         filters = filters & Filter.by_property("code").contains_any(videos)
 
-    if filters is None and min_time is not None:
+    if filters is None and min_time != -1:
         filters = Filter.by_property("start").greater_than(min_time)
-    elif min_time is not None:
+    elif min_time != -1:
         filters = filters & Filter.by_property("start").greater_than(min_time)
 
-    if filters is None and max_time is not None:
+    if filters is None and max_time != -1:
         filters = Filter.by_property("end").less_than(max_time)
-    elif max_time is not None:
+    elif max_time != -1:
         filters = filters & Filter.by_property("end").less_than(max_time)
 
     return filters
@@ -198,7 +198,6 @@ class Weaviate:
         response = c.query.bm25(
             query=query,
             limit=limit,
-            # target_vector=target_vec,
             filters=get_filters(
                 governments, meeting_types, years, speakers, videos, min_time, max_time
             ),
@@ -242,6 +241,7 @@ class Weaviate:
             near_vector=vector,
             limit=limit,
             target_vector=target_vec,
+            # distance=4,
             filters=get_filters(
                 governments, meeting_types, years, speakers, videos, min_time, max_time
             ),
@@ -282,7 +282,6 @@ class Weaviate:
         query_properties=["text^2"],
     ):
         c = self.client.collections.get(collection)
-        print(alpha)
         response = c.query.hybrid(
             query=query,
             alpha=alpha,

@@ -23,8 +23,8 @@ const searchType = ref(route.params.gemeenteType);
 const searchYear = ref(route.params.gemeenteYear);
 const searchVideoID = ref(route.params.videoID);
 const searchSpeaker = ref("");
-const searchMinTime = ref(null);
-const searchMaxTime = ref(null);
+const searchMinTime = ref(-1);
+const searchMaxTime = ref(-1);
 
 const searchResults = ref([]);
 
