@@ -267,18 +267,88 @@ The retrieval of the relevant context is mostly done by the use of a dense vecto
 
 
 \chapter{My work}
+All created tools for this project, except for the crawlers, are accessible by a single Python FastAPI server. I have written a custom client Python class for each tool such as Whisper, pyannote, Weaviate, etc. These clients are imported and instantiated by the server on startup. By making a request to the appropriate endpoint, the server will use these clients to handle user requests, catching errors and exceptions in the process.
+
+
 \section{Crawler}
-\lipsum[10]
+Before any analysis work can begin, the first sub research question \textit{what are the different archive formats local authorities host in order to comply with the Woo and how are these formats exploited to retrieve as much information as possible?} needs to be answered. 
+
+An overwhelming amount of Dutch local municipalities are allied with one of two service providers that provide archiving, hosting and indexing of past meetings. These two service providers are \href{https://www.ibabs.com}{iBabs} and \href{https://www.notubiz.nl/}{NotuBiz}. Notubiz alone serves over 250 local municipalities, provinces and water authorities, while iBabs serves another TODO. 
+
+Thus, in order to create a service that is compatible with most Dutch (local) government instances, a tool must be developed that is capable of extracting the meetings from at least these two hosting services.
+
+TODO: schrijven over wat crawlen/ scrapen/ een crawler is.
+
+\subsubsection{NotuBiz}
+NotuBiz serves many local municipalities in an easy to scrape format. Municipalities have the option to host meetings of different categories and NotuBiz allows for a search to be performed on many different objects such as meeting points, documents, years and meeting types. 
+
+NotuBiz fetches these search results from their server using a GET request. By sniffing the network upon making a search request, I managed to find the endpoint used for search and its necessary parameters. The important keywords are \textit{keywords}, meaning the meeting type, and the \textit{organisations} filter. This organisations filter is especially cumbersome, since it is a municipality specific code used to specify the municipality to be searched. The only way to retrieve this is to make a search request on the desired NotuBiz website and to sniff the network using a dev tool inspector. 
+
+I have created a Python Jupyter Notebook that can scrape any NotuBiz archive with minimal user input needed. Simply the municipality name, the download location, the NotuBiz url, the desired meeting type, the aforementioned unique municipality code and the desired years that the meetings were held. 
+The notebook will then find all meetings using Python's Beautiful Soup, writing the meeting page links to a file. When all meeting links are found, they are parsed by Beautiful Soup. When a download link has been found on the page, the video will be downloaded and saved at the appropriate location.
+
+\subsubsection{iBabs}
+Municipalities utilizing iBabs for their hosting categorize their meetings into various distinct classifications, which are subsequently subdivided by year.
+Each category is listed at the URL 'https://$<$municipality$>$.bestuurlijkeinformatie.nl/Calendar', as seen in figure \ref{fig:ibabsCats}. When a category is chosen, a similar screen allows the user to further specify the year and video.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.95\textwidth]{images/ibabsCats.png}
+    \caption{Nijmegen iBabs categories}
+    \label{fig:ibabsCats}
+\end{figure}
+
+Unlike NotuBiz, iBabs is a dynamically loaded website, meaning data gets loaded in and out of the browser in real-time as users interact with the site. One positive result of this approach is that it enables more responsive and interactive user experiences, as the web page (DOM) can update content without requiring a full page reload. A negative effect is that it makes it more difficult to scrape the webpage for its information and videos.
+In addition to this fact, iBabs also uses a specific file format for their video archives, M3U. TODO: uitleggen wat dit is. This M3U file is only fetched from the server when the user clicks the \textit{play video} button. 
+
+Both these complications mean that more simple scraping tools and HTML parsers such as Python's urllib and Beautiful Soup are not equipped to deal with the necessities that iBabs requires. To solve these issues, Selenium Web Driver is used. Selenmium is an automatable web browser that can be programmed to interact with the DOM, and parse the current web pages. Selenium is also used to sniff the browser's network for the M3U URL that is fetched from the iBabs servers when the \textit{play video} button is clicked. 
+
+I have also written a generic iBabs scraper in the form of a Python Jupyter Notebook. The user only has to specify the municipality name, as seen in the host URL \\ 'https://$<$municipality$>$.bestuurlijkeinformatie.nl/Calendar' and which years should be retrieved. The tool will then fetch all categories that are listen on the home page using Beautiful Soup, creating directories for the municipality, its categories and for each category the different years in the process. 
+Next it will use Beautiful Soup to get links to all pages hosting different videos and writes these links URLs to a file dataPath/municipality/category/year/vergaderingen.txt. 
+When all video pages have been scraped, Selenium is used to open each page, find and click the \textit{play video} button. After this the browser network is sniffed for the fetched M3U file link which is written to the file dataPath/municipality/category/year/vergaderingenDownloads.txt.
+
+After all M3U URLs have been retrieved, the vergaderingenDownloads.txt file is read and videos are downloaded using a M3U download tool. 
+
 
 \section{Video analysis}
+\subsection{Whisper}
+% Schrijven over hoe de whisper client werkt, modulair met class inheritance voor makkelijk switchen van model
+
+\subsection{Pyannote}
+
+
+\subsection{RAG}
+
+\subsection{Meeting points}
 
 \section{Retrieval}
 
-\section{Architecture}
+\section{Architecture overview}
 % Vertellen dat een bert-like embedding model nodig is (verschillende getest, MPnet gekozen vertellen)
-\lipsum[10]
+
 
 \chapter{Experiments}
+\section{Crawler}
+% Schrijven over hoeveel procent van de meetings correct gedownload worden
+\subsubsection{NotuBiz}
+
+\subsubsection{iBabs}
+% Schrijven over time out times enzo van selenium om niet te vroeg element not found + subsequent crash te krijen?
+
+\subsection{Whisper}
+% Accuracy schrijven
+
+\subsection{Pyannote}
+% Scrhijven over accuracy
+% Schrijven over verloren accuracy in zoom meetings
+
+\subsection{RAG}
+% Schrijven over rag en hoe goed het is in retrieven in NL
+% Hoe lang het duurt voor een response enzo
+
+\subsection{Meeting points}
+% Schrijven over dat meeting points niet efficient (en accuraat?) is. Duurt heel lang met LLM enzo
+
 
 \chapter{Discussion}
 % TODO vertellen dat de cross video speaker recognition aardig werkt (nog kwantificeren hoe goed pr3ecies), alleen bij de corona online meetings werkte het een stuk minder geod, vanwege de irreguliere mics en de hoge gain. Dit betekent dus dat de spreker herkenning gelinkt is aan de (type) mic
