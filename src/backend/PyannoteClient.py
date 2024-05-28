@@ -12,8 +12,17 @@ from pyannote.core import Segment
 
 load_dotenv()
 
+class Diarizor:
+    def diorize():
+        print("Diarize method not implemented!")
+        return PyannoteReturnCodes.NOT_IMPLEMENTED
 
-class Pyannote:
+    def embed():
+        print("Embed method not implemented!")
+        return PyannoteReturnCodes.NOT_IMPLEMENTED
+
+
+class Pyannote(Diarizor):
     def __init__(self, device):
         self.diorize_pipeline = Pipeline.from_pretrained(
             "pyannote/speaker-diarization-3.1",
