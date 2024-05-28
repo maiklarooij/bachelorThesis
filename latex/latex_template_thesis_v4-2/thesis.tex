@@ -3,6 +3,7 @@
 
 % Filling your thesis with only lorem ipsum is not advised.
 \usepackage{lipsum}
+\usepackage{listings}
 
 % Citations
 \usepackage[style=numeric]{biblatex}
@@ -228,8 +229,8 @@ Speaker diarisation (SD) is the process of partitioning input audio containing m
 Central to speaker diarisation is voice profile feature extraction. When a reliable and accurate method of embedding voice profiles is achieved, these voice profile vectors can be compared using similarity measures such as cosine similarity or euclidean distance to find different speakers and when they speak. Different systems utilize different methods of obtaining feature vectors. Most of these feature extractors use various representations of sound waves, with additional features derived from pitch information and audio metadata, mostly from the standardised MPEG-7 audio standard \cite{kotti2008speaker, lu2002speaker}. Some of the most common features have a similar accuracy, Mel-frequency cepstral coefficients
 (MFCCs) \cite{gook04} and Line spectral pairs (LSPs) \cite{lu2002speaker}. 
 
-\subsection{Pyannote}
- Pyannote.audio (pyannote) is the current state-of-the-art speaker diarisation mode. It is not only a speaker diarisation model, but it also offers a range of speaker diarization sub-modules. These submodules include voice activity detection, overlapped detection speech, speaker change detection, and more. \cite{bredin2020pyannote, bredin2023pyannote}
+\subsection{Pyannote}\label{sec:pyannote}
+ Pyannote.audio (pyannote) is the current state-of-the-art speaker diarisation mode. It is not only a speaker diarisation model, but it also offers a range of speaker diarisation sub-modules. These submodules include voice activity detection, overlapped detection speech, speaker change detection, and more. \cite{bredin2020pyannote, bredin2023pyannote}
 
 In most competitions, speaker diarisation accuracy is graded by four criteria: speaker confusion rate (CONF), which is the duration of speaking where the speaker is mislabeled, false alarm rate, which is the duration of non-speech incorrectly classified as speech, missed detection, which is the duration of speech that is incorrectly classified as non-speech and Diarisation Error Rate (DER), which is the sum of these three. As can be seen from figure \ref{fig:pyanres}, pyannote scores at the top of most benchmarks. Top benchmarks are greatly improved by their preview baseline, while DERs on benchmarks where pyannote does not score at the top are fairly close, indicating a great overall performance. \cite{bredin2023pyannote}
 
@@ -312,10 +313,59 @@ After all M3U URLs have been retrieved, the vergaderingenDownloads.txt file is r
 
 \section{Video analysis}
 \subsection{Whisper}
-% Schrijven over hoe de whisper client werkt, modulair met class inheritance voor makkelijk switchen van model
+Machine learning is a constantly changing field that evolves rapidly. Every month, dozens of new models and model architectures are released that are more effective in certain situations. 
+With this in mind, one of the fundamental principles I uphold is that the design of AI model clients must be as modular as possible. 
+This is achieved through the implementation of Python class inheritance. 
 
-\subsection{Pyannote}
+In the case of ASR, a base Transcriber class is defined, specifying what methods must be implemented. Then, for each new ASR model, a child class is created where only model specific methods are written. For transcribing, the only model specific method that should be implemented is the \textit{transcribe} method. \textit{transibe} should take in an input path and an output path, which will be used to load the audio file and save the transcription. 
+Other methods such as loading transcriptions are model invariant.
 
+% TODO Uitleggen dat- en waarom whisper is gekozen 
+
+\begin{lstlisting}[language=Python, caption={Modular transcriber class implemented in Apple's MLX Whisper port and PyTorch's Whisper port.}]
+class Transcriber:
+    def transcribe(self, input_file, output_file):
+        print("Transcribe method not implemented!")
+        return  WhisperReturnCodes.NOT_IMPLEMENTED
+
+    def load_transcription(self, path):
+        # Logic which is not specific to any particular model.
+        return transcription
+
+class MLX_Transcriber(Transcriber):
+    def __init__(self, model):
+        self.model = model
+
+    def transcribe(self, input_file, output_file):
+        # MLX whisper transcribe logic.
+        return
+
+class Torch_Transcriber(Transcriber):
+    def __init__(self):
+        self.model = whisper.load_model("medium")
+
+    def transcribe(self, input_file, output_file):
+        # PyTorch whisper transcribe logic.
+        return
+\end{lstlisting}
+
+\subsection{Speaker diarisation}
+The speaker diarisation client is designed following the same principles and methodologies as those employed in the Whisper client. A base class \textit{Diarisor} defining the model dependant methods is declared, which is used as a parent class by model specific classes, in the case of this project, the \textit{Pyannote} class.
+
+The speaker diarisation client only has two model dependant methods: \textit{diarise} and \textit{embed}. The \textit{diarise} method takes in an input path and an output path, which are used to load the audio and save the generated speaker diarisation output file.
+
+As mentioned in section \ref{sec:pyannote}, pyannote.audio is the current state-of-the-art in the field of speaker segmentation. Because of this, the model used in the final architecture is pyannote.audio V3.2.0, the latest version. In case a new, better model is released, this model can be easily implemented due to the modular design of the client.
+
+\begin{lstlisting}[language=Python, caption={Modular speaker diarisation class.}]
+class Diarisor:
+    def diorize(self, input_file, output_file):
+        print("Diarize method not implemented!")
+        return PyannoteReturnCodes.NOT_IMPLEMENTED
+
+    def embed(self, input_file, from_time, to_time):
+        print("Embed method not implemented!")
+        return PyannoteReturnCodes.NOT_IMPLEMENTED
+\end{lstlisting}
 
 \subsection{RAG}
 
@@ -335,6 +385,8 @@ After all M3U URLs have been retrieved, the vergaderingenDownloads.txt file is r
 \subsubsection{iBabs}
 % Schrijven over time out times enzo van selenium om niet te vroeg element not found + subsequent crash te krijen?
 
+
+\section{Video analysis}
 \subsection{Whisper}
 % Accuracy schrijven
 
@@ -349,6 +401,8 @@ After all M3U URLs have been retrieved, the vergaderingenDownloads.txt file is r
 \subsection{Meeting points}
 % Schrijven over dat meeting points niet efficient (en accuraat?) is. Duurt heel lang met LLM enzo
 
+\section{Platform}
+% onderzoekje over vraag beantwoord tijden, vergelijken tussen video + agenda, zoek functie, rag chat functie.
 
 \chapter{Discussion}
 % TODO vertellen dat de cross video speaker recognition aardig werkt (nog kwantificeren hoe goed pr3ecies), alleen bij de corona online meetings werkte het een stuk minder geod, vanwege de irreguliere mics en de hoge gain. Dit betekent dus dat de spreker herkenning gelinkt is aan de (type) mic
