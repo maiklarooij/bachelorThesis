@@ -1,6 +1,8 @@
 import re
 from mlx_lm import load, generate
 
+from UserTypes import LLMReturnCodes
+
 SYSTEM = "<|begin_of_text|><|start_header_id|>system<|end_header_id|>"
 USER   = "<|start_header_id|>user<|end_header_id|>"
 ASSISTENT = "<|start_header_id|>assistant<|end_header_id|>"
@@ -79,6 +81,10 @@ class LLM():
         model, tokenizer = load(model_name)
         self.model = model
         self.tokenizer = tokenizer
+
+    def run(self, history):
+        print("run method not implemented!")
+        return LLMReturnCodes.NOT_IMPLEMENTED
 
 
 class MlxLlama(LLM):
