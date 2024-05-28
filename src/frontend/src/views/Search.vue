@@ -65,8 +65,8 @@ function HandleNewQueryEmit(query) {
 <template>
     <div class="flex flex-col">
         <SearchBar :limit="searchLimit" :alpha="searchAlpha" :method="searchMethod" :gemeente="searchGemeente"
-            :type="searchType" :year="searchYear" :speaker="searchSpeaker" :video="searchVideoID"
-            @newResults="updateResults" @newQuery="HandleNewQueryEmit" />
+            :type="searchType" :year="searchYear" :speaker="searchSpeaker" :video="searchVideoID" :minTime=-1
+            :maxTime=-1 @newResults="updateResults" @newQuery="HandleNewQueryEmit" />
         <SearchSettings :searchGemeenteActive="true" :searchTypeActive="true" :searchYearActive="true"
             :availableSpeakersProp="[]" :gemeentes="gemeentes" @newGemeenteToSearch="updateSearchGemeente"
             @newMeetingTypeToSearch="updateSearchType" @newMeetingYearToSearch="updateSearchYear"
