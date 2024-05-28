@@ -257,7 +257,7 @@ class Weaviate:
                 "properties": o.properties,
                 "uuid": str(o.uuid),
                 "vector": o.vector,
-                "distance": o.metadata.distance,
+                "score": o.metadata.distance,
             }
             for o in response.objects
         ]
