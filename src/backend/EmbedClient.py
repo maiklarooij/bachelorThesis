@@ -5,6 +5,10 @@ from UserTypes import EmbedReturnCodes
 
 
 class Embedder:
+    def __init__(self):
+        print("Init method not implemented!")
+        return EmbedReturnCodes.NOT_IMPLEMENTED
+
     def embed(self, text):
         if not self.model:
             return EmbedReturnCodes.NO_MODEL
