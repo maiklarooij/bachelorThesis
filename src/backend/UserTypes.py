@@ -24,6 +24,11 @@ class PyannoteReturnCodes:
     INPUTFILE_DOES_NOT_EXIST = 1
     OUPUTFILE_ALREADY_EXISTS = 2
     NO_WAV_FILE = 3
+    NOT_IMPLEMENTED = 4
+
+class LLMReturnCodes:
+    OK = 0
+    NOT_IMPLEMENTED = 4
 
 
 class TranscribeBody(BaseModel):

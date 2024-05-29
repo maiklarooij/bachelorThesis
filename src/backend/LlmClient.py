@@ -77,17 +77,17 @@ def history_to_prompt(history):
     return prompt
 
 class LLM():
-    def __init__(self, model_name):
-        model, tokenizer = load(model_name)
-        self.model = model
-        self.tokenizer = tokenizer
-
     def run(self, history):
         print("run method not implemented!")
         return LLMReturnCodes.NOT_IMPLEMENTED
 
 
 class MlxLlama(LLM):
+    def __init__(self, model_name):
+        model, tokenizer = load(model_name)
+        self.model = model
+        self.tokenizer = tokenizer
+
     def run(self, history):
         response = generate(
             self.model,
@@ -96,11 +96,5 @@ class MlxLlama(LLM):
             # verbose=True,
             max_tokens=10000,
         )
-
-        return response
-
-class MlxPhi(LLM):
-    def run(self, history):
-        response = generate(self.model, self.tokenizer, prompt="hello", verbose=True)
 
         return response
