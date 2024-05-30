@@ -30,21 +30,24 @@ This law is applicable to all governmental bodies, from the house of representat
 
 Various online tools such as the official Woo-index \footnote{https://organisaties.overheid.nl/woo} and Woogle \footnote{https://woogle.wooverheid.nl} offer the ability to search through a wide range of uploaded documents and information. 
 Though millions of documents are already publishes and searchable, the searchability of one important type of information is lacking; the meetings. Decisions, from large to small, are made during long meetings that are livestreamed and archived. These video archives, often three to four hours, not only require vast amounts of storage, they are also difficult to comb through. 
+Image a journalist writing an article about a new piece of legislation that was, among other things, debated the night before by the local municipality. They want to write what the different parties think of the bill and how they voted. Currently, they would have to watch or skip through to video until they find the part where they talk about the proposed law. Then, they would have to watch the debate and take notes on what each Representative argued, along with their arguments.  Understandably, this simple sounding process quickly becomes both time consuming and inefficient. 
 
-This paper provides a solution to this issue by answering the question \textit{how can AI be utilized in order to increase information retrievability of large video archives, in particular of democratically elected councils}? In order to land at a satisfying answer to this research question, some related questions need to be answered first. 
+This research provides a solution to this issue by answering the question \textit{how can AI be utilized in order to increase information retrievability of large video archives, in particular of democratically elected councils}? In order to land at a satisfying answer to this research question, some related questions need to be answered first. 
 First, the video archives need to be obtained. This means that the first part of this research will be finding an answer to the question \textit{what are the different archive formats local authorities host in order to comply with the Woo and how are these formats exploited to retrieve as much information as possible}?
 To extract as much relevant information from the video archives, the question \textit{what state-of-the-art audio analysis tools can be used to improve searchability of the meetings}? needs to be answered. During the aforementioned hour long meetings, many different subjects are discussed. By answering the question \textit{how accurately can such a video be segmented into the meaningfully different parts which are discussed}?, this fact can be used to provide a better overview of the video, as well as enhancing searchability. Finally, an answer to the question \textit{what state-of-the-art information retrieval techniques can be leveraged to develop an efficient video information retrieval system}? should be found, tying everything together.
 On top of these base questions, the last part of this research regards an integration of the search system with a large language model, answering the final sub question \textit{how well can the developed search system be integrated with a large language model, creating a helpful chat bot capable of answering questions and providing complementary information when needed}?
+
+\chapter{Related work}
+TODO!
 
 \chapter{Theoretical background}
 
 \section{Natural Language Processing}
 Natural Language Processing (NLP) is the field in computer science primarily focusing on enabling computers to understand human language. Naturally, simply having knowledge of different words and their meaning does not suffice for achieving this goal. A true understanding of language can only be obtained by understanding grammatical rules, contextual details and potential informal vernacular differences in texts from different areas.
 
-Natural language processing is widely used in everyday life. Whenever you see a foreign article on the internet and use the translate feature to translate this text to English for example. Or, blabla bla bla...
+% Natural language processing is widely used in everyday life. Whenever you see a foreign article on the internet and use the translate feature to translate this text to English for example. Or, blabla bla bla...
 
-Natural language processing has its historical roots roughly halfway of the previous century. During this time, early experiments were performed trying to create computer chat bots and to automatically translate foreign languages. From the 1950's onwards, an approach that is now called 'symbolic NLP' was used. Symbolic NLP is similar to the way humans learn to understand languages: using a set of handcrafted rules, structures, patterns and decision trees, a framework for the understanding and generation of a language is created. The machine then follows this set of rules to determine the desired output \cite{Dale00}. One example of this symbolic NLP approach is the ELIZA computer program, dating back to 1964. ELIZA was developed by Joseph Weizenbaum at MIT. ELIZA analyzes input sentences by applying a set of generated decomposition rules and key word detection \cite{weizenbaum66} \cite{Jurafsky08}. A response is then generated by a rule set focused on mimicking Rogerian psychotherapy responses \cite{Yao23}. 
-
+Natural language processing has its historical roots roughly halfway of the previous century. During this time, early experiments were performed trying to create computer chat bots and to automatically translate foreign languages. From the 1950's onwards, an approach that is now called 'symbolic NLP' was used. Symbolic NLP is similar to the way humans learn to understand languages: using a set of handcrafted rules, structures, patterns and decision trees, a framework for the understanding and generation of a language is created. The machine then follows this set of rules to determine the desired output \cite{Dale00}. One example of this symbolic NLP approach is the ELIZA computer program, dating back to 1964. ELIZA was developed by Joseph Weizenbaum at MIT. ELIZA analyzes input sentences by applying a set of generated decomposition rules and key word detection \cite{weizenbaum66} \cite{Jurafsky08}. A response is then generated by a rule set focused on mimicking Rogerian psychotherapy responses \footnote{For more information, see Yao, 2023. \cite{Yao23}}. 
 
 \begin{figure}[h]
     \begin{verbatim}
@@ -53,7 +56,7 @@ Natural language processing has its historical roots roughly halfway of the prev
     [User]:  They're always bugging us about something or other. 
     [ELIZA]: CAN YOU THINK OF A SPECIFIC EXAMPLE?
     [User]:  Well, my boyfriend made me come here.
-    [ELIZA]: YOUR BOYFRIEND MADE YOU COME HERE
+    [ELIZA]: YOUR BOYFRIEND MADE YOU COME HERE?
     [User]:  He says I'm depressed much of the time
     [ELIZA]: I AM SORRY TO HEAR YOU ARE DEPRESSED
     \end{verbatim}
@@ -62,7 +65,7 @@ Natural language processing has its historical roots roughly halfway of the prev
 \end{figure}
 
 
-With the rapid advances of computational power, the lessening of the dominance Noam Chomsky's linguistics theories and the greater digitisation of written texts, the 80's brought in a natural language processing revolution. The old system of rule sets and decision trees was replaced by a new approach using statistics and machine learning. Instead of following a set of rules, statistical NLP focuses on the discovery of common patterns found within a given corpus of language \cite{Manning99}. The detection of these patterns is learned from gigantic bodies of text, called a corpus (plural: corpora). The popularization of the internet and various governments' efforts of digitisation greatly facilitated the collection of these corpora. 
+With the rapid advances of computational power, the lessening of the dominance Noam Chomsky's linguistics theories and the greater digitisation of written texts, the 80's brought in a natural language processing revolution. The old system of rule sets and decision trees was replaced by a new approach using statistics and machine learning. Instead of following a set of rules, statistical NLP focuses on the identification of common patterns found within a given corpus of language \cite{Manning99}. The detection of these patterns is learned from gigantic bodies of text, called a corpus (plural: corpora). The popularization of the internet and various governments' efforts of digitisation greatly facilitated the collection of these corpora. 
 Perhaps the best example of an application of statistical NLP is the predecessor of all current state-of-the-art large language models, the n-gram language model. The n-gram language model works by predicting the occurrence of a word, based on the preceding $n-1$ words. The probability of a word $w_n$ occurring at the end of a sequence of words $w_{n-N+1 : n-1}$ is given by equation \ref{mle} \cite{brown92, Manning99}.
 \begin{equation} \label{mle}
     P(w_{n} | w_{n-N+1 : n-1}) = \frac{C(w_{n-N+1 : n-1} w_{n})}{C(w_{n-N+1 : n-1})}
@@ -93,7 +96,7 @@ Interestingly, these vector representations contain an embedded meaning of the w
     $$V('copper') - V('Cu') + V('zinc') \approx V('Zn')$$
     $$V('Einstein') - V('scientist') + V('Mozart') \approx V('violinist')$$
     $$V('Japan') - V('sushi') + V('Germany') \approx V('bratwurst')$$
-    \caption{Word vector arithmetic examples (read as 'zinc is to ... what copper is to Cu'). From \cite{mikolov13}}
+    \caption{Word vector arithmetic examples (interpreted as 'zinc is to ... what copper is to Cu'). From \cite{mikolov13}}
     \label{fig:vecarith}
 \end{figure}
 
@@ -161,7 +164,7 @@ These remarkable results are achieved by the use of approximate nearest neighbor
 One of the most employed ANN algorithms is Hierarchical Navigable Small World graphs (HNSW) \cite{malkov2018efficient}. This proximity graph based algorithm is TODO
 
 \subsubsection{Hybrid search}
-Many vector databases allow for a combination between ANN powered vector similarity search and probabilistic searches. balblalba...
+Many vector databases allow for a combination between ANN powered vector similarity search and probabilistic searches. todo balblalba...
 
 
 \section{Video \& audio analysis}
@@ -268,17 +271,12 @@ The retrieval of the relevant context is mostly done by the use of a dense vecto
 
 
 \chapter{My work}
-All created tools for this project, except for the crawlers, are accessible by a single Python FastAPI server. I have written a custom client Python class for each tool such as Whisper, pyannote, Weaviate, etc. These clients are imported and instantiated by the server on startup. By making a request to the appropriate endpoint, the server will use these clients to handle user requests, catching errors and exceptions in the process.
-
-
 \section{Crawler}
 Before any analysis work can begin, the first sub research question \textit{what are the different archive formats local authorities host in order to comply with the Woo and how are these formats exploited to retrieve as much information as possible?} needs to be answered. 
 
 An overwhelming amount of Dutch local municipalities are allied with one of two service providers that provide archiving, hosting and indexing of past meetings. These two service providers are \href{https://www.ibabs.com}{iBabs} and \href{https://www.notubiz.nl/}{NotuBiz}. Notubiz alone serves over 250 local municipalities, provinces and water authorities, while iBabs serves another TODO. 
 
 Thus, in order to create a service that is compatible with most Dutch (local) government instances, a tool must be developed that is capable of extracting the meetings from at least these two hosting services.
-
-TODO: schrijven over wat crawlen/ scrapen/ een crawler is.
 
 \subsubsection{NotuBiz}
 NotuBiz serves many local municipalities in an easy to scrape format. Municipalities have the option to host meetings of different categories and NotuBiz allows for a search to be performed on many different objects such as meeting points, documents, years and meeting types. 
@@ -300,9 +298,9 @@ Each category is listed at the URL 'https://$<$municipality$>$.bestuurlijkeinfor
 \end{figure}
 
 Unlike NotuBiz, iBabs is a dynamically loaded website, meaning data gets loaded in and out of the browser in real-time as users interact with the site. One positive result of this approach is that it enables more responsive and interactive user experiences, as the web page (DOM) can update content without requiring a full page reload. A negative effect is that it makes it more difficult to scrape the webpage for its information and videos.
-In addition to this fact, iBabs also uses a specific file format for their video archives, M3U. TODO: uitleggen wat dit is. This M3U file is only fetched from the server when the user clicks the \textit{play video} button. 
+In addition to this fact, iBabs also uses a specific file format for their video archives, M3U. M3U is not a video file. It is a text file that specifies the locations of parts of a video or audio file hosted on a remote server, allowing for more efficient streaming. This M3U file is only fetched from the server when the user clicks the \textit{play video} button. 
 
-Both these complications mean that more simple scraping tools and HTML parsers such as Python's urllib and Beautiful Soup are not equipped to deal with the necessities that iBabs requires. To solve these issues, Selenium Web Driver is used. Selenmium is an automatable web browser that can be programmed to interact with the DOM, and parse the current web pages. Selenium is also used to sniff the browser's network for the M3U URL that is fetched from the iBabs servers when the \textit{play video} button is clicked. 
+Both these complications mean that static scraping tools and HTML parsers such as Python's urllib and Beautiful Soup are not equipped to deal with the necessities that iBabs requires. To solve these issues, Selenium Web Driver is used. Selenium is an automatable web browser that can be programmed to interact with the DOM, and parse the current web pages. Selenium is also used to sniff the browser's network for the M3U URL that is fetched from the iBabs servers when the \textit{play video} button is clicked. 
 
 I have also written a generic iBabs scraper in the form of a Python Jupyter Notebook. The user only has to specify the municipality name, as seen in the host URL \\ 'https://$<$municipality$>$.bestuurlijkeinformatie.nl/Calendar' and which years should be retrieved. The tool will then fetch all categories that are listen on the home page using Beautiful Soup, creating directories for the municipality, its categories and for each category the different years in the process. 
 Next it will use Beautiful Soup to get links to all pages hosting different videos and writes these links URLs to a file dataPath/municipality/category/year/vergaderingen.txt. 
@@ -320,7 +318,7 @@ This is achieved through the implementation of Python class inheritance.
 In the case of ASR, a base Transcriber class is defined, specifying what methods must be implemented. Then, for each new ASR model, a child class is created where only model specific methods are written. For transcribing, the only model specific method that should be implemented is the \textit{transcribe} method. \textit{transibe} should take in an input path and an output path, which will be used to load the audio file and save the transcription. 
 Other methods such as loading transcriptions are model invariant.
 
-% TODO Uitleggen dat- en waarom whisper is gekozen 
+As mentioned before, the current state-of-the-art in automatic speech recognition is OpenAI's Whisper. Two Whisper models have been implemented for the final client: one using MLX, a framework allowing fast machine learning on Apple silicon devices, and one using PyTorch. 
 
 \begin{lstlisting}[language=Python, caption={Modular transcriber class implemented in Apple's MLX Whisper port and PyTorch's Whisper port.}]
 class Transcriber:
@@ -355,6 +353,7 @@ The speaker diarisation client is designed following the same principles and met
 The speaker diarisation client only has two model dependant methods: \textit{diarise} and \textit{embed}. The \textit{diarise} method takes in an input path and an output path, which are used to load the audio and save the generated speaker diarisation output file.
 
 As mentioned in section \ref{sec:pyannote}, pyannote.audio is the current state-of-the-art in the field of speaker segmentation. Because of this, the model used in the final architecture is pyannote.audio V3.2.0, the latest version. In case a new, better model is released, this model can be easily implemented due to the modular design of the client.
+\\\\ % otherwise first line of listing is on this page and the rest on the next page, I did not like that
 
 \begin{lstlisting}[language=Python, caption={Modular speaker diarisation class.}]
 class Diarisor:
@@ -367,14 +366,68 @@ class Diarisor:
         return PyannoteReturnCodes.NOT_IMPLEMENTED
 \end{lstlisting}
 
-\subsection{RAG}
+\subsection{Embedder}
+Just like the previously mentioned clients, the text embedding client used to embed speaking turns is made in a modular manner, allowing different embed models to be used with ease. Practically all sentence embedding models present day are released on HuggingFace, allowing them to be used through a standard method \textit{encode} in the SentenceTransformers framework developed by HuggingFace. This means that only the class initialisation method is model dependant, while the embed method can be model invariant.
+
+\begin{lstlisting}[language=Python, caption={Modular embed class.}]
+class Embedder:
+    def __init__(self):
+        print("Init method not implemented!")
+        return EmbedReturnCodes.NOT_IMPLEMENTED
+
+    def embed(self, text):
+        if not self.model:
+            return EmbedReturnCodes.NO_MODEL
+
+        return self.model.encode(text)
+\end{lstlisting}
+
+Choosing the right embedding model for this project was not as easy as looking at the current leaderboard and selecting the best performing model. The reason for this is the large number of embedding models that are each optimised for different niche use cases. 
+The main requirements for this project was that the model needs to be lightweight, quick, and multilingual. Since thousands of hours of video material needs to be embedded, a quick and light model is important. Even more important however, is multilinguality. Multilinguality ensures that semantically similar sentences in different languages will still map close to each other in the vector space. Since most monolingual embedding model are trained on English text, running these models on Dutch sentences will lead to suboptimal performance.
+
+% TODO: Vertellen over hoe ik tot mpnetv2 ben gekomen en de tests ervoor
 
 \subsection{Meeting points}
 
 \section{Retrieval}
+\subsection{Weaviate}\label{sec:weaviate}
+Unlike the previously mentioned clients, the Weaviate client is not as modular. One of the reasons for this is that releases of new and better database systems are less common that new models. 
+
+The created Weaviate client has methods for various default operations such as creating and deleting collections (similar to tables in relational databases), inserting and deleting entries and getting collection metadata. Besides these basic operations, three search methods from section \ref{retrievalSection} have been implemented: Vector search, BM25 search and Hybrid search.
+
+All search methods allow the user to specify filter parameters such as government, year, speaker and more. Invariant of employed the search method, the client returns data in a uniform format—an array of relevant result objects. Each result object within this array includes properties such as meeting ID, government, year, etc., the result's UUID, its vector representation, and its relevance score.
+
+\subsection{RAG}
+RAG consists of two parts: retrieval and generation. A user query is first fed in to the retrieval system which returns one or more pieces of context that are most relevant to the specified query. Next, this context is added to the user query after which a LLM will answer the query using the acquired context. 
+
+The final web app uses a BM25 based retrieval pipeline as specified in section \ref{sec:weaviate}. If no results are found, this is signaled to the user and the process is aborted. In the likely scenario that results are found, the results are added to the query and the LLM is called to answer the question.
+
+Identical to the other clients, the LLM client designed to be modular and easily swapped. The base model only has a single model dependant method: \textit{run}. \textit{run} takes the chat history as an arguments and prompts the LLM. 
+In the final product one of two LLM clients are used: A locally running Llama client or a GPT client that calls the OpenAI api. The former can be used on machines that have sufficient RAM and a strong GPU. The latter is recommended for other machines. Since it calls the OpenAI GPT api it is both quick and accurate, bringing with it only a small cost of \$15 per one million output tokens.
+
+\begin{lstlisting}[language=Python, caption={Modular LLM class.}]
+class LLM:
+    def run(self, history):
+        print("run method not implemented!")
+        return LLMReturnCodes.NOT_IMPLEMENTED
+\end{lstlisting}
+
+\section{Web application}
+To make all previously mentioned functionalities accessible to a user, I created a user friendly front end interface using Vue 3.
+
+The web app has two main functionalities, the first being a global search. 
+This global search allows the user to search through all available video transcripts. In the case where only a single government, meeting type or year should be searched, selectable filters are present that allow the user to only query specific data.
+
+The other functionality allows the user to navigate to a specific video through the archive by choosing the government, meeting type and year. When a video is selected, the video is shown and playable. Below the video different speakers and their speaking turns as well as the meeting discussion points and their times are shown. When a speaker or discussion point is clicked, the video is skipped forward to the clicked timestamp. 
+Below the video, a search bar similar to the global search allows the user to search for information in the video. In this video search, both speakers and discussion points can be filtered. 
+% TODO: Praten over chat functie
 
 \section{Architecture overview}
-% Vertellen dat een bert-like embedding model nodig is (verschillende getest, MPnet gekozen vertellen)
+Every describer client is accessible through a single Python FastAPI server. 
+On startup, this server instantiates the clients, which are then called by the server when requests to certain endpoints are made.
+
+\subsection{municipality pipeline}
+TODO: Schrijven over hoe de pipeline vans crapen naar toevoegen in de database gaat en verloopt
 
 
 \chapter{Experiments}
