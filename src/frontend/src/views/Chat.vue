@@ -15,11 +15,12 @@ function scrollToBottom() {
 }
 
 function newQuestion(question) {
-    chatHistory.value.push({role: "user", "visible": true, content: question})
     console.log("TODO: make request to chat endpoint")
-    // setTimeout(() => {
-    chatHistory.value.push({ role: "assistant", "visible": true, content: "answer to the question" })
-    scrollToBottom()
+    chatHistory.value.push({role: "user", "visible": true, content: question})
+    // console.log("TODO: make request to chat endpoint")
+    // // setTimeout(() => {
+    // chatHistory.value.push({ role: "assistant", "visible": true, content: "answer to the question" })
+    // scrollToBottom()
     // }, 897)
 }
 

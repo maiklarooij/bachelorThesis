@@ -42,6 +42,8 @@ async function sendChat(newQuestion) {
     const data = await resp.json();
     console.log(data)
     if (data.response) {
+        const lastIndex = chatHistory.value.length - 1
+        chatHistory.value[lastIndex].content += '\n\nContext: ' + data.context
         chatHistory.value.push({ role: "assistant", "visible": true, content: data.response })
     }
 }
