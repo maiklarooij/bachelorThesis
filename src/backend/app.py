@@ -41,7 +41,7 @@ from WhisperClient import MLX_Transcriber, Torch_Transcriber
 from PyannoteClient import Pyannote
 from WeaviateClient import Weaviate
 from EmbedClient import SFRMistralEmbedder, MpnetEmbedder
-from LlmClient import MlxLlama
+from LlmClient import MlxLlama, OpenAiLlama
 from T5Client import T5
 
 
@@ -72,7 +72,8 @@ print("Loading embedding client")
 embed_client = MpnetEmbedder()
 
 llm_client = None
-# print("Loading llm client")
+print("Loading llm client")
+llm_client = OpenAiLlama(model_name="gpt-3.5-turbo")
 # llm_client = MlxLlama(model_name="mlx-community/Meta-Llama-3-8B-Instruct-8bit")
 
 t5_client = None
@@ -371,8 +372,8 @@ async def chat(body: ChatBody):
         raise HTTPException(status_code=503, detail="Llm client not active")
     if not weaviate_client:
         raise HTTPException(status_code=503, detail="Weaviate client not active")
-    if not embed_client:
-        raise HTTPException(status_code=503, detail="Embed client not active")
+    # if not embed_client:
+    #     raise HTTPException(status_code=503, detail="Embed client not active")
 
     if body.language != "nl" and body.language != "en":
         raise HTTPException(status_code=500, detail="Language should be 'nl' or 'en'")
@@ -405,6 +406,8 @@ async def chat(body: ChatBody):
     print("Running llama")
     resp = llm_client.run(history)
 
+    print(resp)
+
     return { "status": "OK", "response": resp }
 
 
@@ -433,7 +436,7 @@ async def translate_e_d(body: TranslateBody):
 
 
 BASE_PATHS = [
-    "/Volumes/Samsung_T5/data/",
+    # "/Volumes/Samsung_T5/data/",
     # "/Volumes/Drive/data/",
     "/Users/personal/Desktop/scriptie/notebooks/final/",
 ]
