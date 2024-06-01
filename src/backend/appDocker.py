@@ -63,8 +63,8 @@ pyannote_client = None
 # pyannote_client = Pyannote(device)
 
 weaviate_client = None
-# print("Loading Weaviate client")
-# weaviate_client = Weaviate()
+print("Loading Weaviate client")
+weaviate_client = Weaviate(host="weaviate")
 
 embed_client = None
 print("Loading embedding client")

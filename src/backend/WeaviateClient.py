@@ -88,14 +88,15 @@ def get_filters(governments, meeting_types, years, speakers, videos, min_time, m
 
 class Weaviate:
     def __init__(self, host="localhost", port="8080"):
-        # self.client = weaviate.connect_to_custom(
-        #     http_host=host,
-        #     http_port=port,
-        #     http_secure=False,
-        #     auth_credentials=weaviate.auth.AuthApiKey(os.getenv("WCS_DEMO_RO_KEY")),
-        #     additional_config=weaviate.config.AdditionalConfig(timeout=(5, 15)),
-        # )
-        self.client = weaviate.connect_to_local()
+        self.client = weaviate.connect_to_custom(
+            http_host=host,
+            http_port=port,
+            http_secure=False,
+            grpc_host=host,
+            grpc_port=50051,
+            grpc_secure=False,
+        )
+        # self.client = weaviate.connect_to_local()
 
     def destroy(self):
         self.client.close()

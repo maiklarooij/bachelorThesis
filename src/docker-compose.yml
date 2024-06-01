@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  weaviate:
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - '8080'
+      - --scheme
+      - http
+    image: cr.weaviate.io/semitechnologies/weaviate:1.24.8
+    ports:
+      - 8080:8080
+      - 50051:50051
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    networks:
+      - videotulen
+    restart: on-failure:0
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: 'none'
+      CLUSTER_HOSTNAME: 'node1'
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3012:3012"
+    volumes:
+      - /Users/personal/Desktop/scriptie/notebooks/data:/app/videos
+      - /Users/personal/Desktop/scriptie/notebooks/final/:/Users/personal/Desktop/scriptie/notebooks/final/
+    networks:
+      - videotulen
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    networks:
+      - videotulen
+
+volumes:
+  weaviate_data:
+
+networks:
+  videotulen:
+    driver: bridge
