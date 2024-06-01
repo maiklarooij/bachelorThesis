@@ -1,5 +1,8 @@
 import re
+
+from dotenv import load_dotenv
 from mlx_lm import load, generate
+from openai import OpenAI
 
 from UserTypes import LLMReturnCodes
 
@@ -98,3 +101,21 @@ class MlxLlama(LLM):
         )
 
         return response
+
+
+class OpenAiLlama(LLM):
+    def __init__(self, model_name):
+        load_dotenv()
+        self.client = OpenAI()
+        # Recommended to use 'gpt-3.5-turbo' or 'gpt-4o'
+        self.model_name = model_name
+
+    def run(self, history):
+        response = self.client.chat.completions.create(
+            model=self.model_name,
+            # history is a list of objects with role and content keys, OpenAI
+            # expects history in this format so no further processing is needed
+            messages=history,
+        )
+
+        return response.choices[0].message.content
