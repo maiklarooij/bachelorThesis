@@ -74,14 +74,14 @@ def get_filters(governments, meeting_types, years, speakers, videos, min_time, m
     elif len(videos) > 0:
         filters = filters & Filter.by_property("code").contains_any(videos)
 
-    if filters is None and min_time != -1:
+    if filters is None and (min_time != -1 and min_time is not None):
         filters = Filter.by_property("start").greater_than(min_time)
-    elif min_time != -1:
+    elif min_time != -1 and min_time is not None:
         filters = filters & Filter.by_property("start").greater_than(min_time)
 
-    if filters is None and max_time != -1:
+    if filters is None and (max_time != -1 and max_time is not None):
         filters = Filter.by_property("end").less_than(max_time)
-    elif max_time != -1:
+    elif max_time != -1 and max_time is not None:
         filters = filters & Filter.by_property("end").less_than(max_time)
 
     return filters
@@ -194,7 +194,19 @@ class Weaviate:
         max_time,
         query_properties=["text^2"],
     ):
+        print("collection", collection)
+        print("query", query)
+        print("limit", limit)
+        print("target_vec", target_vec)
+        print("governments", governments)
+        print("meeting_types", meeting_types)
+        print("years", years)
+        print("speakers", speakers)
+        print("videos", videos)
+        print("min_time", min_time)
+        print("max_time", max_time)
         c = self.client.collections.get(collection)
+        print("b")
         response = c.query.bm25(
             query=query,
             limit=limit,
@@ -204,6 +216,7 @@ class Weaviate:
             query_properties=query_properties,
             return_metadata=MetadataQuery(score=True),
         )
+        print("c")
 
         # print(response.objects)
         # print(type(response.objects))
