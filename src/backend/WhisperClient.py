@@ -1,12 +1,14 @@
 import os
+import platform
 import json
 import huggingface_hub
 
 from UserTypes import WhisperReturnCodes
 
 import whisper
-import whisperMLX
 
+if platform.system() == "Darwin":
+    import whisperMLX
 
 # Base transcriber class.
 class Transcriber:

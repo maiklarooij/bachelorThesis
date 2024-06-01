@@ -1,8 +1,10 @@
+import platform
 import re
 
 from dotenv import load_dotenv
-from mlx_lm import load, generate
 from openai import OpenAI
+if platform.system() == "Darwin":
+    from mlx_lm import load, generate
 
 from UserTypes import LLMReturnCodes
 
