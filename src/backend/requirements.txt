@@ -6,6 +6,7 @@ mlx_lm
 model
 numba
 numpy
+openai
 openai-whisper
 pyannote.audio
 pyannote.core
