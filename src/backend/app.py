@@ -50,7 +50,6 @@ load_dotenv()
 device = "mps" if torch.backends.mps.is_available() else 'cuda' if torch.cuda.is_available() else "cpu"
 print(f"Running on {device}")
 
-# TODO: check if cuda/ mlx is available and initialise based on that
 whisper_client = None
 # if device == "mps":
 #     print("Loading whisper MLX client")
@@ -408,7 +407,7 @@ async def chat(body: ChatBody):
 
     print(resp)
 
-    return { "status": "OK", "response": resp }
+    return { "status": "OK", "response": resp, "context": context }
 
 
 # Translates Dutch to English
