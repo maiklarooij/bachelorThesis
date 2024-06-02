@@ -30,7 +30,7 @@ This law is applicable to all governmental bodies, from the house of representat
 
 Various online tools such as the official Woo-index \footnote{https://organisaties.overheid.nl/woo} and Woogle \footnote{https://woogle.wooverheid.nl} offer the ability to search through a wide range of uploaded documents and information. 
 Though millions of documents are already publishes and searchable, the searchability of one important type of information is lacking; the meetings. Decisions, from large to small, are made during long meetings that are livestreamed and archived. These video archives, often three to four hours, not only require vast amounts of storage, they are also difficult to comb through. 
-Image a journalist writing an article about a new piece of legislation that was, among other things, debated the night before by the local municipality. They want to write what the different parties think of the bill and how they voted. Currently, they would have to watch or skip through to video until they find the part where they talk about the proposed law. Then, they would have to watch the debate and take notes on what each Representative argued, along with their arguments.  Understandably, this simple sounding process quickly becomes both time consuming and inefficient. 
+Imagine a journalist writing an article about a new piece of legislation that was, among other things, debated the night before by the local municipality. They want to write what the different parties think of the bill and how they voted. Currently, they would have to watch or skip through to video until they find the part where they talk about the proposed law. Then, they would have to watch the debate and take notes on what each Representative argued, along with their arguments.  Understandably, this simple sounding process quickly becomes both time consuming and inefficient. 
 
 This research provides a solution to this issue by answering the question \textit{how can AI be utilized in order to increase information retrievability of large video archives, in particular of democratically elected councils}? In order to land at a satisfying answer to this research question, some related questions need to be answered first. 
 First, the video archives need to be obtained. This means that the first part of this research will be finding an answer to the question \textit{what are the different archive formats local authorities host in order to comply with the Woo and how are these formats exploited to retrieve as much information as possible}?
@@ -38,7 +38,14 @@ To extract as much relevant information from the video archives, the question \t
 On top of these base questions, the last part of this research regards an integration of the search system with a large language model, answering the final sub question \textit{how well can the developed search system be integrated with a large language model, creating a helpful chat bot capable of answering questions and providing complementary information when needed}?
 
 \chapter{Related work}
-TODO!
+The act of archiving and transcribing parliamentary meetings is not new. Most big governmental organisations such as the European Parlement and the Dutch House of Representatives host an online archive that offers an elementary search mechanism. 
+These online archives offer a pleasant viewing experience, showing the current speaker and what is being said. Most of the time, the active speaker is not automatically detected, but the information is taken from the currently active microphone, which is linked to a person. Occasionally, this results in an incorrect speaker being highlighted when the speaker speaks through a different microphone than they were assigned.
+On top of this, the search functionalities that these existing archives offer is often limited to a naive keyword search comparable to a control+f search, or they offer no searching at all.
+
+Some proprietary tools provide users the ability to search specifically through (AI generated) meeting notes. The main purpose of these tools generally is the generation of notes, not the searching. As a result, the search mechanism is a simple keyword search, showing all text snippets containing the given query. 
+
+Stepping away from searching through meeting video archives,previous studies have explored the searching of video archives containing online lectures. The majority of these studies use a combination of transcripts and optical character recognition (OCR) obtain relevant search results, leveraging the fact that on-screen text has a high probability of being relevant to the discussed subject \cite{Adcock10, yang14}. 
+Unfortunately, this approach won't work for searching through parliamentary meetings since these meetings held without an accompanying screen that is showing information. 
 
 \chapter{Theoretical background}
 
@@ -418,16 +425,37 @@ To make all previously mentioned functionalities accessible to a user, I created
 The web app has two main functionalities, the first being a global search. 
 This global search allows the user to search through all available video transcripts. In the case where only a single government, meeting type or year should be searched, selectable filters are present that allow the user to only query specific data.
 
-The other functionality allows the user to navigate to a specific video through the archive by choosing the government, meeting type and year. When a video is selected, the video is shown and playable. Below the video different speakers and their speaking turns as well as the meeting discussion points and their times are shown. When a speaker or discussion point is clicked, the video is skipped forward to the clicked timestamp. 
+The other functionality allows the user to navigate to a specific video through the archive by choosing the government, meeting type and year. When a video is selected, the video is shown and playable. 
+Below the vide,o different speakers and their speaking turns as well as the meeting discussion points and their times are shown. When a speaker or discussion point is clicked, the video is skipped forward to the clicked timestamp. 
 Below the video, a search bar similar to the global search allows the user to search for information in the video. In this video search, both speakers and discussion points can be filtered. 
-% TODO: Praten over chat functie
 
-\section{Architecture overview}
-Every describer client is accessible through a single Python FastAPI server. 
-On startup, this server instantiates the clients, which are then called by the server when requests to certain endpoints are made.
+Next to the video, a LLM powered chat window allows the user to interactively ask questions and information about the video.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/frontend.png}
+    \caption{Web application video view}
+    \label{fig:frontendVid}
+\end{figure}
 
-\subsection{municipality pipeline}
-TODO: Schrijven over hoe de pipeline vans crapen naar toevoegen in de database gaat en verloopt
+
+
+% \section{Architecture overview}
+% Each client described earlier is accessible through a single Python FastAPI server. 
+% On startup, this server instantiates the clients, which are then called by the server when requests to certain endpoints are made.
+
+\subsection{Analysis pipeline}
+Before a municipality can be added to the archive, all meetings have to be downloaded and analysed. A diagram of the analysis pipeline is shown in figure \ref{fig:pipeline}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/pipeline.png}
+    \caption{Video analysis pipeline}
+    \label{fig:pipeline}
+\end{figure}
+
+The two most important analysis scripts are \textit{transcribe} and \textit{diarise}. These script run Whisper and pyannote respectively, and create a file containing the transcript and diarisation. data. the diarisation data is then used to create a diarisationObject, a JSON file containing the voice profile embedding of each speaker and when they are speaking. Also, a speakerSheet is created. This is and Excel file that an administrator should fill in manually. It maps a detected speaker to a given name, allowing speaker recognition including names. Keep in mind that this should only be done once. Annotated speakers will also be available for videos that were not annotated.
+
+The transcript and diarisation information together are used to create a turnObject. This is a JSON file that contains text of each speaking turn for each speaker and the textual embedding. When this file is created it is combined with the diarisationObject in order to create the final objects that will be added to Weaviate.
 
 
 \chapter{Experiments}
