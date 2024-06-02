@@ -197,6 +197,15 @@ async def create_collection(body: WeaviateCreateCollectionBody):
 
     return { "status": "OK" }
 
+@app.post("/api/weaviate/createCollectionTranscripts")
+async def create_collection_trans(body: WeaviateCreateCollectionBody):
+    if not weaviate_client:
+        raise HTTPException(status_code=503, detail="Weaviate client not active")
+
+    weaviate_client.create_transcripts_collection(body)
+
+    return {"status": "OK"}
+
 
 # TODO: error handling
 @app.post("/api/weaviate/insert")
@@ -435,7 +444,7 @@ async def translate_e_d(body: TranslateBody):
 
 
 BASE_PATHS = [
-    # "/Volumes/Samsung_T5/data/",
+    "/Volumes/Samsung_T5/data/",
     # "/Volumes/Drive/data/",
     "/Users/personal/Desktop/scriptie/notebooks/final/",
 ]
