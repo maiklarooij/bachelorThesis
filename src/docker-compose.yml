@@ -34,6 +34,8 @@ services:
     volumes:
       - /Users/personal/Desktop/scriptie/notebooks/data:/app/videos
       - /Users/personal/Desktop/scriptie/notebooks/final/:/Users/personal/Desktop/scriptie/notebooks/final/
+      - /Users/personal/Desktop/scriptie/notebooks/data/:/Users/personal/Desktop/scriptie/notebooks/data/
+      - /Volumes/Samsung_T5/data:/Volumes/Samsung_T5/data
     networks:
       - videotulen
 
