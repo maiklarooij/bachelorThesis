@@ -119,7 +119,6 @@ async def transcribe(body: TranscribeBody):
     return { "status": "OK" }
 
 
-# TODO
 @app.post("/api/pyannote/diorize")
 async def diorize(body: DiorizeBody):
     if not pyannote_client:
@@ -153,7 +152,6 @@ async def embed_speech(body: SpeechEmbedBody):
         HTTPException(status_code=500, detail=f"Internal server error: {e}")
 
 
-# TODO: error handling
 @app.get("/api/weaviate/getInfo")
 async def get_info():
     if not weaviate_client:
@@ -163,31 +161,26 @@ async def get_info():
     return { "status": "OK", "info": info }
 
 
-# TODO: error handling
 @app.get("/api/weaviate/getCollections")
 async def get_colletions():
     if not weaviate_client:
         raise HTTPException(status_code=503, detail="Weaviate client not active")
 
     collections = weaviate_client.get_all_collections()
-    # print(collections)
 
     return { "status": "OK", "collections": collections }
 
 
-# TODO: error handling
 @app.post("/api/weaviate/getCollection")
 async def get_colletion(body: WeaviateGetCollectionBody):
     if not weaviate_client:
         raise HTTPException(status_code=503, detail="Weaviate client not active")
 
     info = weaviate_client.get_collection_info(body.collection)
-    # print(info)
 
     return { "status": "OK", "collectionInfo": info }
 
 
-# TODO: error handling
 @app.post("/api/weaviate/createCollection")
 async def create_collection(body: WeaviateCreateCollectionBody):
     if not weaviate_client:
@@ -207,7 +200,6 @@ async def create_collection_trans(body: WeaviateCreateCollectionBody):
     return {"status": "OK"}
 
 
-# TODO: error handling
 @app.post("/api/weaviate/insert")
 async def insert(body: WeaviateInsertBody):
     if not weaviate_client:
@@ -217,11 +209,11 @@ async def insert(body: WeaviateInsertBody):
         weaviate_client.insert_objects(body.collection, body.objects)
     except Exception as e:
         print("Error:", e)
+        raise HTTPException(status_code=503, detail="Unexpected error while inserting")
 
     return { "status": "OK" }
 
 
-# TODO: error handling
 @app.post("/api/weaviate/searchHybrid")
 async def search_h(body: WeaviateSearchHybridBody):
     if not weaviate_client:
@@ -245,12 +237,10 @@ async def search_h(body: WeaviateSearchHybridBody):
     if body.query_properties is not None:
         kwargs["query_properties"] = body.query_properties
     objects = weaviate_client.search_hybrid(**kwargs)
-    # Verify objects & get return code
 
     return {"status": "OK", "objects": objects}
 
 
-# TODO: error handling
 @app.post("/api/weaviate/searchBM25")
 async def search_b(body: WeaviateSearchBM25Body):
     if not weaviate_client:
@@ -272,12 +262,10 @@ async def search_b(body: WeaviateSearchBM25Body):
     if body.query_properties is not None:
         kwargs["query_properties"] = body.query_properties
     objects = weaviate_client.search_bm25(**kwargs)
-    # Verify objects & get return code
 
     return {"status": "OK", "objects": objects}
 
 
-# TODO: error handling
 @app.post("/api/weaviate/searchVector")
 async def search_v(body: WeaviateSearchVectorBody):
     if not weaviate_client:
@@ -296,24 +284,25 @@ async def search_v(body: WeaviateSearchVectorBody):
         body.minTime,
         body.maxTime,
     )
-    # Verify objects & get return code
 
     return { "status": "OK", "objects": objects }
 
-@app.post("/api/weaviate/getContext")
-async def get_speech_context(body: WeaviateGetContext):
-    if not weaviate_client:
-        raise HTTPException(status_code=503, detail="Weaviate client not active")
+# Originally this was planned for the chat functionality, after some reworking
+# and further thought it turned out to not be neccesary
+# @app.post("/api/weaviate/getContext")
+# async def get_speech_context(body: WeaviateGetContext):
+#     if not weaviate_client:
+#         raise HTTPException(status_code=503, detail="Weaviate client not active")
 
-    context_size = 3
-    min_speech_num = min(0, body.speechNum)
-    for speech_num in range(min_speech_num, min_speech_num+2*context_size):
-        print(speech_num)
-        # weaviate_client.get_context()
+#     context_size = 3
+#     min_speech_num = min(0, body.speechNum)
+#     for speech_num in range(min_speech_num, min_speech_num+2*context_size):
+#         print(speech_num)
+#         # weaviate_client.get_context()
 
-    context = ""
+#     context = ""
 
-    return { "status": "OK", "context": context}
+#     return { "status": "OK", "context": context}
 
 @app.post("/api/weaviate/getSpeakerName")
 async def get_speaker_name(body: WeaviateGetSpeakerNameBody):
@@ -325,7 +314,6 @@ async def get_speaker_name(body: WeaviateGetSpeakerNameBody):
     return { "status": "OK", "name": name }
 
 
-# TODO: error handling
 @app.post("/api/weaviate/deleteCollection")
 async def delete_collection(body: WeaviateDeleteCollectionBody):
     if not weaviate_client:
@@ -336,16 +324,15 @@ async def delete_collection(body: WeaviateDeleteCollectionBody):
     return { "status": "OK" }
 
 
-# TODO: error handling
-@app.post("/api/weaviate/deleteEntry")
-async def delete_entry():
-    if not weaviate_client:
-        raise HTTPException(status_code=503, detail="Weaviate client not active")
+# Not neccesary, maybe in the future
+# @app.post("/api/weaviate/deleteEntry")
+# async def delete_entry():
+#     if not weaviate_client:
+#         raise HTTPException(status_code=503, detail="Weaviate client not active")
 
-    raise HTTPException(status_code=501, detail="Not implemented")
+#     raise HTTPException(status_code=501, detail="Not implemented")
 
 
-# TODO
 @app.post("/api/embed")
 async def embed(body: EmbedBody):
     if not embed_client:
@@ -355,23 +342,25 @@ async def embed(body: EmbedBody):
 
     return { "status": "OK", "embeddings": embeddings }
 
-@app.post("/api/agenda")
-async def agenda(body: AgendaBody):
-    if not llm_client:
-        raise HTTPException(status_code=503, detail="Llm client not active")
-    if not t5_client:
-        raise HTTPException(status_code=503, detail="T5 translate client not active")
 
-    # TODO Split body.full_text in 6k token windows (with a bit of overlap)
-    agenda_points = [
-        t5_client.dutch_to_english(p["agendaPoint"]) for p in body.agenda_points
-    ]
-    prompt = t5_client.dutch_to_english(
-        "Gegeven het volgende transcript van een gemeente vergadering en een lijst met agenda punten, per agenda punt aan bij welke zin ze beginnen. De tekst is opgedeeld in kleinere stukken, dus niet alle agenda punten hoeven aan bod te komen."
-    )
+# In the end, agenda parsing uses a different method so this end point is not
+# neccesary anymore.
+# @app.post("/api/agenda")
+# async def agenda(body: AgendaBody):
+#     if not llm_client:
+#         raise HTTPException(status_code=503, detail="Llm client not active")
+#     if not t5_client:
+#         raise HTTPException(status_code=503, detail="T5 translate client not active")
 
-    print(agenda_points)
-    print(prompt)
+#     agenda_points = [
+#         t5_client.dutch_to_english(p["agendaPoint"]) for p in body.agenda_points
+#     ]
+#     prompt = t5_client.dutch_to_english(
+#         "Gegeven het volgende transcript van een gemeente vergadering en een lijst met agenda punten, per agenda punt aan bij welke zin ze beginnen. De tekst is opgedeeld in kleinere stukken, dus niet alle agenda punten hoeven aan bod te komen."
+#     )
+
+#     print(agenda_points)
+#     print(prompt)
 
 
 @app.post("/api/chat")
@@ -380,6 +369,7 @@ async def chat(body: ChatBody):
         raise HTTPException(status_code=503, detail="Llm client not active")
     if not weaviate_client:
         raise HTTPException(status_code=503, detail="Weaviate client not active")
+    # Needed if using hybrid search
     # if not embed_client:
     #     raise HTTPException(status_code=503, detail="Embed client not active")
 
@@ -394,7 +384,7 @@ async def chat(body: ChatBody):
         [body.government],
         [body.meeting_type],
         [body.year],
-        [],  # Speakers, todo later
+        [],
         [body.video],
         None,
         None,
@@ -410,37 +400,37 @@ async def chat(body: ChatBody):
     history = body.history
     history[-1]["content"] = f'{history[-1]["content"]}\n\nContext: {context}'
 
-    # TODO: translate to english and back after response
     print("Running llama")
     resp = llm_client.run(history)
 
-    print(resp)
+    # print(resp)
 
     return { "status": "OK", "response": resp, "context": context }
 
 
+# Not needed anymore
 # Translates Dutch to English
-@app.post("/api/translateDE")
-async def translate_d_e(body: TranslateBody):
-    if not t5_client:
-        raise HTTPException(status_code=503, detail="T5 translate client not active")
+# @app.post("/api/translateDE")
+# async def translate_d_e(body: TranslateBody):
+#     if not t5_client:
+#         raise HTTPException(status_code=503, detail="T5 translate client not active")
 
-    resp = t5_client.dutch_to_english(body.text)
-    print(resp)
+#     resp = t5_client.dutch_to_english(body.text)
+#     print(resp)
 
-    return { "status": "OK", "response": resp }
+#     return { "status": "OK", "response": resp }
 
-
+# Not needed anymore
 # Translates English to Dutch
-@app.post("/api/translateDE")
-async def translate_e_d(body: TranslateBody):
-    if not t5_client:
-        raise HTTPException(status_code=503, detail="T5 translate client not active")
+# @app.post("/api/translateDE")
+# async def translate_e_d(body: TranslateBody):
+#     if not t5_client:
+#         raise HTTPException(status_code=503, detail="T5 translate client not active")
 
-    resp = t5_client.english_to_dutch(body.text)
-    print(resp)
+#     resp = t5_client.english_to_dutch(body.text)
+#     print(resp)
 
-    return { "status": "OK", "response": resp }
+#     return { "status": "OK", "response": resp }
 
 
 BASE_PATHS = [
