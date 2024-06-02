@@ -57,6 +57,7 @@ fetch(`http://127.0.0.1:3012/api/getAgenda?gemeente=${route.params.gemeenteName}
 .then(response => response.json())
 .then(data => {
     var total = 0;
+    if (!data.agenda) return
     agenda.value = data.agenda.map(function (obj) {
         if (obj.time != null) {
             const seconds = HMStoSeconds(obj.time)
@@ -203,6 +204,21 @@ function isOffset() {
 function goToOriginalVideo() {
     if (route.params.gemeenteName == "hoekschewaard") {
         const url = `https://hoekschewaard.notubiz.nl/vergadering/${route.params.videoID}`;
+        window.open(url, '_blank')
+    } else if (route.params.gemeenteName == "buren") {
+        const url = `https://buren.bestuurlijkeinformatie.nl/Agenda/Index/${route.params.videoID}`;
+        window.open(url, '_blank')
+    } else if (route.params.gemeenteName == "ridderkerk") {
+        const url = `https://ridderkerk.notubiz.nl/vergadering/${route.params.videoID}`;
+        window.open(url, '_blank')
+    } else if (route.params.gemeenteName == "nijmegen") {
+        const url = `https://nijmegen.bestuurlijkeinformatie.nl/Agenda/Index/${route.params.videoID}`;
+        window.open(url, '_blank')
+    } else if (route.params.gemeenteName == "haarlem") {
+        const url = `https://gemeentebestuur-haarlem.notubiz.nl/vergadering/${route.params.videoID}`;
+        window.open(url, '_blank')
+    } else if (route.params.gemeenteName == "barendrecht") {
+        const url = `https://barendrecht.raadsinformatie.nl/vergadering/${route.params.videoID}`;
         window.open(url, '_blank')
     } else {
         console.log("TODO: GOTO", route.params.gemeenteName)

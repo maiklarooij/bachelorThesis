@@ -63,7 +63,7 @@ function highlightQuery(text) {
 
 <template>
     <div class="flex flex-col content-between my-1 min-w-80 max-w-4xl min-h-24 p-4">
-        <div class="flex flex-row text-left font-bold text-lg">
+        <div class="flex flex-row text-left font-bold text-lg text-nowrap">
             <div class="">
                 {{ government }} -
             </div>
