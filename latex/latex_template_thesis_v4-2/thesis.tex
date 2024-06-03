@@ -198,7 +198,7 @@ One particularly large milestone was the Sphinx-II system, developed in 1992 by,
 \begin{equation} \label{eq:wer}
     WER = \frac{S + D + I}{S + D + C}
 \end{equation}
-where:
+where: \\
 \begin{conditions}
  S     &  the number of substitutions \\
  D     &  the number of deletions \\   
@@ -469,11 +469,32 @@ The transcript and diarisation information together are used to create a turnObj
 
 \section{Video analysis}
 \subsection{Whisper}
-% Accuracy schrijven
+The Word Error Rate (WER) (equation \ref{eq:wer}) is a standard metric to evaluate ASR systems. 
+
+To evaluate Whisper's performance on the scraped meetings, I manually transcribed 30 minutes of meetings, selected randomly from five different meetings. To account for structural- and unimportant transcription differences, a normalisation is applied to both the reference and the hypothesis text. 
+This normalisation removes all non-alphabetical characters and converts all text to lowercase. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.85\textwidth]{}
+    \caption{Whisper transcription results}
+    \label{fig:whisperExperiment}
+\end{figure}
 
 \subsection{Pyannote}
-% Scrhijven over accuracy
-% Schrijven over verloren accuracy in zoom meetings
+As described in section \ref{sec:pyannote}, speaker diarisation is scored based on the Diarisation Error Rate (DER). At the time of writing, pyannote.audio offers the best performing speaker diarisation, as shown in figure \ref{fig:pyanres}. 
+
+To test how well pyannote performs on the municipality dataset, I manually annotated 30 random minutes of meetings, distributed over five different meetings. I used audio tool audacity to obtain millisecond-accurate timestamps. During manual diarisation, speakers were named arbitrarily. After diarisation, the manual speaker names were mapped to the speaker names given by pyannote to make sure the confusion rate metric can be performed.
+
+To address systemic differences in the idea when speech begins and ends, I performed two metrics. One with a 250 milliseconds collar, and one without a collar. 
+A collar is a margin of time around each speaker turn boundary. A 250 milliseconds collar would mean that the 125 milliseconds before and after each speaker change are excluded from evaluation.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.85\textwidth]{}
+    \caption{pyannote speaker diarisation results}
+    \label{fig:pyanExperiment}
+\end{figure}
 
 \subsection{RAG}
 % Schrijven over rag en hoe goed het is in retrieven in NL
@@ -482,8 +503,28 @@ The transcript and diarisation information together are used to create a turnObj
 \subsection{Meeting points}
 % Schrijven over dat meeting points niet efficient (en accuraat?) is. Duurt heel lang met LLM enzo
 
-\section{Platform}
-% onderzoekje over vraag beantwoord tijden, vergelijken tussen video + agenda, zoek functie, rag chat functie.
+\section{Search engine}
+To obtain insights in how well the developed search engine works, I gathered X participants to look for the answer to five questions using five different search methods.
+
+\begin{enumerate}
+    \item The contemporary way, scrolling through the video and using its agenda points;
+    \item Using the vector search engine;
+    \item Using the BM25 search engine;
+    \item Using the hybrid search engine;
+    \item Using the chat function.
+\end{enumerate}
+
+For each participant, the search methods were randomly mapped to a question. 
+Each session was recorded so the time taken for each question, any filters used, or other relevant information could be analysed later.
+
+The questions were:
+\begin{enumerate}
+    \item Q1
+    \item Q2
+    \item Q3
+    \item Q4
+    \item Q5
+\end{enumerate}
 
 \chapter{Discussion}
 % TODO vertellen dat de cross video speaker recognition aardig werkt (nog kwantificeren hoe goed pr3ecies), alleen bij de corona online meetings werkte het een stuk minder geod, vanwege de irreguliere mics en de hoge gain. Dit betekent dus dat de spreker herkenning gelinkt is aan de (type) mic
