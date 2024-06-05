@@ -73,8 +73,16 @@ def get_number_videos_gemeentes(path):
         for year in os.listdir(f"{path}/{meeting_type}"):
             if year.startswith("."):
                 continue
-            if os.path.isdir(f"{path}/{meeting_type}/{year}/videos"):
-                total += len([v for v in os.listdir(f"{path}/{meeting_type}/{year}/videos") if not v.startswith(".")])
+            if os.path.isdir(f"{path}/{meeting_type}/{year}/finalObjects"):
+                total += len(
+                    [
+                        v
+                        for v in os.listdir(
+                            f"{path}/{meeting_type}/{year}/finalObjects"
+                        )
+                        if not v.startswith(".")
+                    ]
+                )
 
     return total
 

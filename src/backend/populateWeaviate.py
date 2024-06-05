@@ -136,84 +136,76 @@ if __name__ == "__main__":
     print("Creating transcript collection")
     create_transcript_collection()
 
-    to_include = [
-        "/Users/personal/Desktop/scriptie/notebooks/final/buren",
-        "/Users/personal/Desktop/scriptie/notebooks/data/nijmegen",
-        "/Volumes/Samsung_T5/data/hoekschewaard",
-        "/Volumes/Samsung_T5/data/ridderkerk",
-        "/Volumes/Samsung_T5/data/barendrecht",
-        "/Volumes/Drive/data/haarlem",
-    ]
-
-    for p in to_include:
-        if not os.path.isdir(p):
+    data_path = "/app/data"
+    for p in os.listdir(data_path):
+        if not os.path.isdir(f"{data_path}/{p}") or p.startswith("."):
             continue
-        print("Populating weaviate with", p)
-        add_transcripts(p)
+        print("Populating weaviate with", f"{data_path}/{p}")
+        add_transcripts(f"{data_path}/{p}")
 
 
     # SPEAKERS INSERTS
     annotated_files_2023_hoekschewaard = [
-        "/Users/personal/Desktop/scriptie/notebooks/data/hoekschewaard/2023/sheets/1068470.wav.rttm.xlsx",
-        "/Users/personal/Desktop/scriptie/notebooks/data/hoekschewaard/2023/sheets/1068534.wav.rttm.xlsx",
-        "/Users/personal/Desktop/scriptie/notebooks/data/hoekschewaard/2023/sheets/1068543.wav.rttm.xlsx",
-        "/Users/personal/Desktop/scriptie/notebooks/data/hoekschewaard/2023/sheets/1109657.wav.rttm.xlsx",
+        f"{data_path}/hoekschewaard/vergaderingen/2023/sheets/1068470.wav.rttm.xlsx",
+        f"{data_path}/hoekschewaard/vergaderingen/2023/sheets/1068534.wav.rttm.xlsx",
+        f"{data_path}/hoekschewaard/vergaderingen/2023/sheets/1068543.wav.rttm.xlsx",
+        f"{data_path}/hoekschewaard/vergaderingen/2023/sheets/1109657.wav.rttm.xlsx",
     ]
     annotated_files_2024_hoekschewaard = [
-        "/Users/personal/Desktop/scriptie/notebooks/data/hoekschewaard/2024/sheets/1178278.wav.rttm.xlsx",
-        "/Users/personal/Desktop/scriptie/notebooks/data/hoekschewaard/2024/sheets/1178261.wav.rttm.xlsx",
-        "/Users/personal/Desktop/scriptie/notebooks/data/hoekschewaard/2024/sheets/1192781.wav.rttm.xlsx",
+        f"{data_path}/hoekschewaard/vergaderingen/2024/sheets/1178278.wav.rttm.xlsx",
+        f"{data_path}/hoekschewaard/vergaderingen/2024/sheets/1178261.wav.rttm.xlsx",
+        f"{data_path}/hoekschewaard/vergaderingen/2024/sheets/1192781.wav.rttm.xlsx",
     ]
     for path in annotated_files_2023_hoekschewaard:
         try:
             handle_file("hoekschewaard", "vergadering", "2023", path)
-        except Exception as _:
-            print("error in", path)
+        except Exception as e:
+            print("error in", path, e)
     for path in annotated_files_2024_hoekschewaard:
         try:
             handle_file("hoekschewaard", "vergadering", "2024", path)
-        except Exception as _:
-            print("error in", path)
+        except Exception as e:
+            print("error in", path, e)
 
     annotated_files_2023_ridderkerk = [
-        "/Users/personal/Desktop/scriptie/notebooks/data/ridderkerk/2023/sheets/1068434.wav.rttm.xlsx",
-        "/Users/personal/Desktop/scriptie/notebooks/data/ridderkerk/2023/sheets/1068445.wav.rttm.xlsx",
+        f"{data_path}/ridderkerk/vergaderingen/2023/sheets/1068434.wav.rttm.xlsx",
+        f"{data_path}/ridderkerk/vergaderingen/2023/sheets/1068445.wav.rttm.xlsx",
     ]
     annotated_files_2024_ridderkerk = [
-        "/Users/personal/Desktop/scriptie/notebooks/data/ridderkerk/2024/sheets/1147151.wav.rttm.xlsx",
-        "/Users/personal/Desktop/scriptie/notebooks/data/ridderkerk/2024/sheets/1147158.wav.rttm.xlsx",
-        "/Users/personal/Desktop/scriptie/notebooks/data/ridderkerk/2024/sheets/1147176.wav.rttm.xlsx",
-        "/Users/personal/Desktop/scriptie/notebooks/data/ridderkerk/2024/sheets/1147208.wav.rttm.xlsx",
+        f"{data_path}/ridderkerk/vergaderingen/2024/sheets/1147151.wav.rttm.xlsx",
+        f"{data_path}/ridderkerk/vergaderingen/2024/sheets/1147158.wav.rttm.xlsx",
+        f"{data_path}/ridderkerk/vergaderingen/2024/sheets/1147176.wav.rttm.xlsx",
+        f"{data_path}/ridderkerk/vergaderingen/2024/sheets/1147208.wav.rttm.xlsx",
     ]
     for path in annotated_files_2023_ridderkerk:
         try:
             handle_file("ridderkerk", "vergadering", "2023", path)
-        except Exception as _:
-            print("error in", path)
+        except Exception as e:
+            print("error in", path, e)
     for path in annotated_files_2024_ridderkerk:
         try:
             handle_file("ridderkerk", "vergadering", "2024", path)
-        except Exception as _:
-            print("error in", path)
+        except Exception as e:
+            print("error in", path, e)
 
     annotated_files_2023_barendrecht = [
-        "/Users/personal/Desktop/scriptie/notebooks/data/barendrecht/2023/sheets/1094927.wav.rttm.xlsx",
-        "/Users/personal/Desktop/scriptie/notebooks/data/barendrecht/2023/sheets/1108841.wav.rttm.xlsx",
-        "/Users/personal/Desktop/scriptie/notebooks/data/barendrecht/2023/sheets/1115813.wav.rttm.xlsx",
+        f"{data_path}/barendrecht/vergaderingen/2023/sheets/1094927.wav.rttm.xlsx",
+        f"{data_path}/barendrecht/vergaderingen/2023/sheets/1108841.wav.rttm.xlsx",
+        f"{data_path}/barendrecht/vergaderingen/2023/sheets/1115813.wav.rttm.xlsx",
     ]
     annotated_files_2024_barendrecht = [
-        "/Users/personal/Desktop/scriptie/notebooks/data/barendrecht/2024/sheets/1195585.wav.rttm.xlsx",
-        "/Users/personal/Desktop/scriptie/notebooks/data/barendrecht/2024/sheets/1203464.wav.rttm.xlsx",
-        "/Users/personal/Desktop/scriptie/notebooks/data/barendrecht/2024/sheets/1203469.wav.rttm.xlsx",
-        "/Users/personal/Desktop/scriptie/notebooks/data/barendrecht/2024/sheets/1223517.wav.rttm.xlsx",
+        f"{data_path}/barendrecht/vergaderingen/2024/sheets/1195585.wav.rttm.xlsx",
+        f"{data_path}/barendrecht/vergaderingen/2024/sheets/1203464.wav.rttm.xlsx",
+        f"{data_path}/barendrecht/vergaderingen/2024/sheets/1203469.wav.rttm.xlsx",
+        f"{data_path}/barendrecht/vergaderingen/2024/sheets/1223517.wav.rttm.xlsx",
     ]
     for path in annotated_files_2023_barendrecht:
         try:
             handle_file("barendrecht", "vergadering", "2023", path)
-        except Exception as _:
-            print("error in", path)
+        except Exception as e:
+            print("error in", path, e)
     for path in annotated_files_2024_barendrecht:
         try:
             handle_file("barendrecht", "vergadering", "2024", path)
-        except Exception as _:
-            print("error in", path)
+        except Exception as e:
+            print("error in", path, e)
