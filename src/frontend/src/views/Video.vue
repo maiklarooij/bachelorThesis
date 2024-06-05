@@ -8,6 +8,7 @@ import VideoChat from "../components/VideoChat.vue"
 
 const route = useRoute()
 
+const vid404 = ref(false)
 const isHovering = ref(false)
 const lineLeft = ref(0)
 const videoUrl = ref(null);
@@ -37,6 +38,7 @@ fetch(`http://127.0.0.1:3012/api/getVideo?gemeente=${route.params.gemeenteName}&
     })
     .catch(error => {
         console.error('Error fetching video:', error);
+        vid404.value = true
     });
 
 fetch(`http://127.0.0.1:3012/api/getSpeakers?gemeente=${route.params.gemeenteName}&meetingType=${route.params.gemeenteType}&year=${route.params.gemeenteYear}&video=${route.params.videoID}.mp4`)
@@ -70,7 +72,7 @@ fetch(`http://127.0.0.1:3012/api/getAgenda?gemeente=${route.params.gemeenteName}
     createAgendaMapping()
 })
 
-const hrWidth = computed(() => videoDuration.value * 1)
+const hrWidth = computed(() => !isNaN(videoDuration.value) ? videoDuration.value : 14000 )
 
 const availableSpeakerColors = ['bg-red-600', 'bg-red-700', 'bg-red-800', 'bg-red-900', 'bg-orange-600', 'bg-orange-700', 'bg-orange-800', 'bg-orange-900', 'bg-amber-600', 'bg-amber-700', 'bg-amber-800', 'bg-amber-900', 'bg-lime-600', 'bg-lime-700', 'bg-lime-800', 'bg-lime-900', 'bg-emerald-600', 'bg-emerald-700', 'bg-emerald-800', 'bg-emerald-900', 'bg-pink-600', 'bg-pink-700', 'bg-pink-800', 'bg-pink-900', 'bg-rose-600', 'bg-rose-700', 'bg-rose-800', 'bg-rose-900']
 const availableAgendaColors = ['bg-red-600', 'bg-red-700', 'bg-red-800', 'bg-red-900', 'bg-orange-600', 'bg-orange-700', 'bg-orange-800', 'bg-orange-900', 'bg-amber-600', 'bg-amber-700', 'bg-amber-800', 'bg-amber-900', 'bg-lime-600', 'bg-lime-700', 'bg-lime-800', 'bg-lime-900', 'bg-emerald-600', 'bg-emerald-700', 'bg-emerald-800', 'bg-emerald-900', 'bg-pink-600', 'bg-pink-700', 'bg-pink-800', 'bg-pink-900', 'bg-rose-600', 'bg-rose-700', 'bg-rose-800', 'bg-rose-900']
@@ -266,6 +268,9 @@ async function downloadInfo() {
                             </a>
                         </p>
                     </video>
+                    <span v-else-if="vid404">
+                        Video could not be retrieved
+                    </span>
                     <span v-else>
                         video is loading...
                     </span>
