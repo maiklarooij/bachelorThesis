@@ -436,9 +436,10 @@ async def chat(body: ChatBody):
 
 
 BASE_PATHS = [
+    "/app/data",
     # "/Volumes/Samsung_T5/data/",
     # "/Volumes/Drive/data/",
-    "/Users/personal/Desktop/scriptie/notebooks/final/",
+    # "/Users/personal/Desktop/scriptie/notebooks/final/",
 ]
 @app.get("/api/gemeentes")
 async def get_gemeentes():
@@ -515,10 +516,10 @@ async def get_gemeente_videos(gemeente: str, meetingType: str, year: str):
             detail=f"Gemeente {gemeente} with type {meetingType} and year {year} does not exist.",
         )
 
-    video_dir = f"{p}/videos"
+    video_dir = f"{p}/finalObjects"
     if os.path.isdir(video_dir):
         videos = [
-            {"video": v.replace(".mp4", "")}
+            {"video": v.replace(".mp4.json", "")}
             for v in os.listdir(video_dir)
             if not v.startswith(".")
         ]

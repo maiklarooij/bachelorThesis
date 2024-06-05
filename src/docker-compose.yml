@@ -33,9 +33,12 @@ services:
       - "3012:3012"
     volumes:
       - /Users/personal/Desktop/scriptie/notebooks/data:/app/videos
-      - /Users/personal/Desktop/scriptie/notebooks/final/:/Users/personal/Desktop/scriptie/notebooks/final/
-      - /Users/personal/Desktop/scriptie/notebooks/data/:/Users/personal/Desktop/scriptie/notebooks/data/
-      - /Volumes/Samsung_T5/data:/Volumes/Samsung_T5/data
+      - ./appDockerData:/app/data
+    # Remove these volumes and add one with only finalData
+      # - /Users/personal/Desktop/scriptie/notebooks/data:/app/videos
+      # - /Users/personal/Desktop/scriptie/notebooks/final/:/Users/personal/Desktop/scriptie/notebooks/final/
+      # - /Users/personal/Desktop/scriptie/notebooks/data/:/Users/personal/Desktop/scriptie/notebooks/data/
+      # - /Volumes/Samsung_T5/data:/Volumes/Samsung_T5/data
     networks:
       - videotulen
 
