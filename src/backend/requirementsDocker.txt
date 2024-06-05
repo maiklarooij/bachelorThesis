@@ -5,6 +5,7 @@ numba
 numpy
 openai
 openai-whisper
+openpyxl
 pyannote.audio
 pyannote.core
 pyannote.database
