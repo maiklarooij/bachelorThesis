@@ -16,6 +16,7 @@ __pycache__
 
 *.npz
 src/models/*
-!src/models/README.md
-
 *appDockerData*
+
+!src/models/README.md
+!videotulenDemo.mp4
