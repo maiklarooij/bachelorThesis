@@ -19,7 +19,7 @@ const route = useRoute()
 function goToVideo() {
     if (route.fullPath === "/search") {
         // '/vergaderingen/' is temp, needs to be fixed to a weaviate property indicating the meeting type
-        const url = `/gemeente/${props.government}/vergaderingen/${props.year}/${props.code}`;
+        const url = `/#/gemeente/${props.government}/vergaderingen/${props.year}/${props.code}`;
         window.open(url, '_blank')
     } else {
         console.log("TODO: open pop up/ chat scherm?")
