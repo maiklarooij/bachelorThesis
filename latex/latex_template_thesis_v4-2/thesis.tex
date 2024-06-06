@@ -34,7 +34,7 @@ Imagine a journalist writing an article about a new piece of legislation that wa
 
 This research provides a solution to this issue by answering the question \textit{how can AI be utilized in order to increase information retrievability of large video archives, in particular of democratically elected councils}? In order to land at a satisfying answer to this research question, some related questions need to be answered first. 
 First, the video archives need to be obtained. This means that the first part of this research will be finding an answer to the question \textit{what are the different archive formats local authorities host in order to comply with the Woo and how are these formats exploited to retrieve as much information as possible}?
-To extract as much relevant information from the video archives, the question \textit{what state-of-the-art audio analysis tools can be used to improve searchability of the meetings}? needs to be answered. During the aforementioned hour long meetings, many different subjects are discussed. By answering the question \textit{how accurately can such a video be segmented into the meaningfully different parts which are discussed}?, this fact can be used to provide a better overview of the video, as well as enhancing searchability. Finally, an answer to the question \textit{what state-of-the-art information retrieval techniques can be leveraged to develop an efficient video information retrieval system}? should be found, tying everything together.
+To extract as much relevant information from the video archives, the question \textit{what state-of-the-art video- and audio analysis tools can be used to improve searchability of the meetings, and how accurate are these in the given circumstances}? needs to be answered. During the aforementioned hour long meetings, many different subjects are discussed. By answering the question \textit{how accurately can such a video be segmented into the meaningfully different parts which are discussed}?, this fact can be used to provide a better overview of the video, as well as enhancing searchability. Finally, an answer to the question \textit{what state-of-the-art information retrieval techniques can be leveraged to develop an efficient video information retrieval system}? should be found, tying everything together.
 On top of these base questions, the last part of this research regards an integration of the search system with a large language model, answering the final sub question \textit{how well can the developed search system be integrated with a large language model, creating a helpful chat bot capable of answering questions and providing complementary information when needed}?
 
 \chapter{Related work}
@@ -468,6 +468,7 @@ The transcript and diarisation information together are used to create a turnObj
 
 
 \section{Video analysis}
+Answering the research question \textit{what state-of-the-art video- and audio analysis tools can be used to improve searchability of the meetings, and how accurate are these in the given circumstances}? involves evaluating the two utilized analysis tools: Whisper and pyannote.
 \subsection{Whisper}
 The Word Error Rate (WER) (equation \ref{eq:wer}) is a standard metric to evaluate ASR systems. 
 
@@ -476,7 +477,7 @@ This normalisation removes all non-alphabetical characters and converts all text
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.85\textwidth]{}
+    \includegraphics[width=0.85\textwidth]{images/whisperBench.png}
     \caption{Whisper transcription results}
     \label{fig:whisperExperiment}
 \end{figure}
@@ -484,27 +485,23 @@ This normalisation removes all non-alphabetical characters and converts all text
 \subsection{Pyannote}
 As described in section \ref{sec:pyannote}, speaker diarisation is scored based on the Diarisation Error Rate (DER). At the time of writing, pyannote.audio offers the best performing speaker diarisation, as shown in figure \ref{fig:pyanres}. 
 
-To test how well pyannote performs on the municipality dataset, I manually annotated 30 random minutes of meetings, distributed over five different meetings. I used audio tool audacity to obtain millisecond-accurate timestamps. During manual diarisation, speakers were named arbitrarily. After diarisation, the manual speaker names were mapped to the speaker names given by pyannote to make sure the confusion rate metric can be performed.
+To test how well pyannote performs on the municipality dataset, I manually annotated 30 random minutes of meetings, distributed over five different meetings. I used audio tool Audacity to obtain millisecond-accurate timestamps. During manual diarisation, speakers were named arbitrarily. After diarisation, the manual speaker names were mapped to the speaker names given by pyannote to make sure the confusion rate metric can be performed.
 
-To address systemic differences in the idea when speech begins and ends, I performed two metrics. One with a 250 milliseconds collar, and one without a collar. 
+To address systemic differences in the idea when speech begins and ends, I performed two metrics. One with a 500 milliseconds collar, one with a 50 milliseconds collar, and one without a collar. 
 A collar is a margin of time around each speaker turn boundary. A 250 milliseconds collar would mean that the 125 milliseconds before and after each speaker change are excluded from evaluation.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.85\textwidth]{}
+    \includegraphics[width=0.85\textwidth]{images/pyannoteBench.png}
     \caption{pyannote speaker diarisation results}
     \label{fig:pyanExperiment}
 \end{figure}
-
-\subsection{RAG}
-% Schrijven over rag en hoe goed het is in retrieven in NL
-% Hoe lang het duurt voor een response enzo
 
 \subsection{Meeting points}
 % Schrijven over dat meeting points niet efficient (en accuraat?) is. Duurt heel lang met LLM enzo
 
 \section{Search engine}
-To obtain insights in how well the developed search engine works, I gathered X participants to look for the answer to five questions using five different search methods.
+To Answer the main research question \textit{how can AI be utilized in order to increase information retrievability of large video archives, in particular of democratically elected councils}? and the subquestion \textit{how well can the developed search system be integrated with a large language model, creating a helpful chat bot capable of answering questions and providing complementary information when needed}?, I gathered 20 participants and tasked them to find the answer to five questions using five different search methods.
 
 \begin{enumerate}
     \item The contemporary way, scrolling through the video and using its agenda points;
@@ -525,6 +522,8 @@ The questions were:
     \item Hoe laat wordt de inspreker gewekt door de bromtonen van de nabijliggende windmolens?
     \item Wat is het doel van het voorstel met betrekking tot de gemeenschappelijke regeling van de bedrijfsvoeringspartner?
 \end{enumerate}
+
+% TODO: grafieken en data parsen en hierin zetten!
 
 \chapter{Discussion}
 % TODO vertellen dat de cross video speaker recognition aardig werkt (nog kwantificeren hoe goed pr3ecies), alleen bij de corona online meetings werkte het een stuk minder geod, vanwege de irreguliere mics en de hoge gain. Dit betekent dus dat de spreker herkenning gelinkt is aan de (type) mic
